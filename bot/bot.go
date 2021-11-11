@@ -27,12 +27,12 @@ func Start() {
 	session.AddHandler(message)
 	session.AddHandler(ready)
 
-	fmt.Print("Bot is online")
 	defer session.Close()
 	if err = session.Open(); err != nil {
 		fmt.Println(err)
 		return
 	}
+	fmt.Print("Bot is online")
 
 	scall := make(chan os.Signal, 1)
 	signal.Notify(scall, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV, syscall.SIGHUP)
