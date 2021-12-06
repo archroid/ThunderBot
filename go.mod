@@ -1,13 +1,14 @@
-module test/Discord-Template
+module archroid/ElProfessorBot
 
 go 1.17
 
 require (
-	github.com/bwmarrin/discordgo v0.23.2
-	github.com/enescakir/emoji v1.0.0
+	github.com/bwmarrin/discordgo v0.23.3-0.20211204170245-092735083ddf
+	golang.org/x/text v0.3.6
 )
 
 require (
-	github.com/gorilla/websocket v1.4.0 // indirect
-	golang.org/x/crypto v0.0.0-20181030102418-4d3f4d9ffa16 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
+	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e // indirect
+	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
 )

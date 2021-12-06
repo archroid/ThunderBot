@@ -1,20 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"test/Discord-Template/bot"
-	"test/Discord-Template/config"
+	"archroid/ElProfessorBot/bot"
+	"os"
 )
 
 func main() {
-	err := config.ReadConfig()
 
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	token := os.Getenv("DISCORD_BOT_TOKEN")
 
-	bot.Start()
+	bot.Start(token)
 
-	<-make(chan struct{})
+	// <-make(chan struct{})
 	return
 }

@@ -1,47 +1,54 @@
 package bot
 
 import (
+	embed "archroid/ElProfessorBot/utils"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
-	"test/Discord-Template/config"
-	embed "test/Discord-Template/utils"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-var botID string
-var client *discordgo.Session
+var session *discordgo.Session
+var guildID string = "891371656323428393"
 
-func Start() {
-	session, err := discordgo.New("Bot " + config.Token)
+func Start(token string) {
+
+	session, err := discordgo.New("Bot " + token)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
 	session.AddHandler(message)
 	session.AddHandler(ready)
+	session.AddHandler(command)
 
 	defer session.Close()
 	if err = session.Open(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Print("Bot is online")
+	fmt.Println("Bot is online")
 
-	scall := make(chan os.Signal, 1)
-	signal.Notify(scall, syscall.SIGINT, syscall.SIGTERM, syscall.SIGSEGV, syscall.SIGHUP)
-	<-scall
+	addCommands(session, commands)
+
+	stop := make(chan os.Signal)
+	signal.Notify(stop, os.Interrupt)
+	<-stop
+	log.Println("Gracefully shutdowning")
+	deleteAllCommands(session)
+
 }
 
-func ready(bot *discordgo.Session, event *discordgo.Ready) {
-	guildsSize := len(bot.State.Guilds)
-	bot.UpdateGameStatus(0, strconv.Itoa(guildsSize)+" guilds!")
+func ready(session *discordgo.Session, event *discordgo.Ready) {
+	guildsSize := len(session.State.Guilds)
+	session.UpdateGameStatus(1, strconv.Itoa(guildsSize)+" guilds!")
 }
 
 func message(bot *discordgo.Session, message *discordgo.MessageCreate) {
@@ -49,7 +56,7 @@ func message(bot *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 	switch {
-	case strings.HasPrefix(message.Content, config.BotPrefix):
+	case strings.HasPrefix(message.Content, "&"):
 		ping := bot.HeartbeatLatency().Truncate(60).Round(time.Millisecond)
 		if message.Content == "&ping" {
 
@@ -88,5 +95,78 @@ func message(bot *discordgo.Session, message *discordgo.MessageCreate) {
 			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
 
 		}
+
+		if message.Content == "&clear" {
+
+			st, err := bot.ChannelMessages(message.ChannelID, 99, message.Reference().MessageID, "", "")
+			if err != nil {
+				log.Panicln(err)
+				return
+			}
+
+			var messageIds []string
+			for _, strings := range st {
+				messageIds = append(messageIds, strings.Reference().MessageID)
+			}
+
+			messageIds = append(messageIds, message.Reference().MessageID)
+
+			log.Printf("msgid %v", 0)
+			log.Printf("%v messages deleted \n", len(messageIds))
+
+			//Delete messages
+			bot.ChannelMessagesBulkDelete(message.ChannelID, messageIds)
+
+			//Say the user about deleted messagess
+			embed := embed.NewEmbed().
+				SetTitle(fmt.Sprintf("%v messages has been deleted!", len(messageIds))).
+				SetColor(0xff0000).
+				MessageEmbed
+			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
+
+			//Delete the message itself
+			embedMessage, err := bot.ChannelMessages(message.ChannelID, 1, "", "", "")
+			if err != nil {
+				log.Panicln(err)
+				return
+			}
+			println(len(embedMessage))
+			embedMessageString := embedMessage[0].Reference().MessageID
+
+			//wait 3 seconds
+			time.Sleep(time.Second * 2)
+
+			bot.ChannelMessageDelete(message.ChannelID, embedMessageString)
+
+		}
 	}
+}
+
+func command(session *discordgo.Session, i *discordgo.InteractionCreate) {
+	if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+		h(session, i)
+	}
+}
+
+func addCommands(session *discordgo.Session, commands []*discordgo.ApplicationCommand) {
+	for _, v := range commands {
+		_, err := session.ApplicationCommandCreate(session.State.User.ID, guildID, v)
+		if err != nil {
+			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+		}
+	}
+
+	commandslist, _ := session.ApplicationCommands(session.State.User.ID, guildID)
+	log.Printf("Activated commands: %v \n", len(commandslist))
+}
+
+func deleteAllCommands(session *discordgo.Session) {
+	commands, _ := session.ApplicationCommands(session.State.User.ID, guildID)
+	for _, v := range commands {
+		err := session.ApplicationCommandDelete(session.State.User.ID, guildID, v.ID)
+		if err != nil {
+			log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
+		}
+	}
+	log.Printf("removed %v slash command(s) \n", len(commands))
 }
