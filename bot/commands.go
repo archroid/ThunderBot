@@ -10,6 +10,8 @@ import (
 )
 
 var (
+	guildID string = "801840788022624296"
+
 	commands = []*discordgo.ApplicationCommand{
 		{
 			Name: "ping",
@@ -25,10 +27,15 @@ var (
 					Type:        discordgo.ApplicationCommandOptionInteger,
 					Name:        "number-of-messages",
 					Description: "Number of messages to delete(max 100)",
-					Required:    true,
+					Required:    false,
 				},
 			},
 		},
+
+		// {
+
+		// 	Name: "",
+		// },
 	}
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -54,7 +61,11 @@ var (
 
 		"clear": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-			deleteNum := i.ApplicationCommandData().Options[0].IntValue()
+			var deleteNum int64 = 100
+
+			if len(i.ApplicationCommandData().Options) == 1 {
+				deleteNum = i.ApplicationCommandData().Options[0].IntValue()
+			}
 
 			st, err := s.ChannelMessages(i.ChannelID, int(deleteNum), "", "", "")
 			if err != nil {
@@ -63,11 +74,15 @@ var (
 			}
 			var messageIds []string
 			for _, strings := range st {
+				messageTimestamp, _ := strings.Timestamp.Parse()
+				messageTimestampUnix := messageTimestamp.Unix()
 
-				// println(strings.Timestamp)
-				// if strings.Timestamp >= discordgo.Timestamp() {
-				// }
-				messageIds = append(messageIds, strings.Reference().MessageID)
+				twoWeeksTimestampUnix := time.Now().AddDate(0, 0, -14).Unix()
+
+				if messageTimestampUnix >= twoWeeksTimestampUnix {
+					messageIds = append(messageIds, strings.Reference().MessageID)
+				}
+
 			}
 
 			deletedMSG := fmt.Sprintf("%v message(s) has been deleted!", len(messageIds))
@@ -78,7 +93,7 @@ var (
 				deletedMSG = "You can only bulk delete messages that are under 14 days old."
 			}
 
-			log.Println(deletedMSG)
+			// log.Println(deletedMSG)
 
 			embed := embed.NewEmbed().
 				SetTitle(deletedMSG).
@@ -99,3 +114,23 @@ var (
 		},
 	}
 )
+
+func addCommands(session *discordgo.Session, commands []*discordgo.ApplicationCommand) {
+	for _, v := range commands {
+		_, err := session.ApplicationCommandCreate(session.State.User.ID, guildID, v)
+		if err != nil {
+			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+		}
+	}
+
+}
+
+func deleteAllCommands(session *discordgo.Session) {
+	commands, _ := session.ApplicationCommands(session.State.User.ID, guildID)
+	for _, v := range commands {
+		err := session.ApplicationCommandDelete(session.State.User.ID, guildID, v.ID)
+		if err != nil {
+			log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
+		}
+	}
+}
