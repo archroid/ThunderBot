@@ -15,7 +15,7 @@ import (
 )
 
 var session *discordgo.Session
-var guildID string = "891371656323428393"
+var guildID string = "801840788022624296"
 
 func Start(token string) {
 
@@ -47,8 +47,8 @@ func Start(token string) {
 }
 
 func ready(session *discordgo.Session, event *discordgo.Ready) {
-	guildsSize := len(session.State.Guilds)
-	session.UpdateGameStatus(1, strconv.Itoa(guildsSize)+" guilds!")
+	log.Printf("Bot joined in %v guild(s) \n", len(session.State.Guilds))
+	session.UpdateGameStatus(5, "/help")
 }
 
 func message(bot *discordgo.Session, message *discordgo.MessageCreate) {

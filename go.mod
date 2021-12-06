@@ -2,10 +2,7 @@ module archroid/ElProfessorBot
 
 go 1.17
 
-require (
-	github.com/bwmarrin/discordgo v0.23.3-0.20211204170245-092735083ddf
-	golang.org/x/text v0.3.6
-)
+require github.com/bwmarrin/discordgo v0.23.3-0.20211204170245-092735083ddf
 
 require (
 	github.com/gorilla/websocket v1.4.2 // indirect

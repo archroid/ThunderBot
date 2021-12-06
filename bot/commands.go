@@ -70,7 +70,7 @@ var (
 				messageIds = append(messageIds, strings.Reference().MessageID)
 			}
 
-			deletedMSG := fmt.Sprintf("%v messages has been deleted!", len(messageIds))
+			deletedMSG := fmt.Sprintf("%v message(s) has been deleted!", len(messageIds))
 
 			err = s.ChannelMessagesBulkDelete(i.ChannelID, messageIds)
 
@@ -78,7 +78,7 @@ var (
 				deletedMSG = "You can only bulk delete messages that are under 14 days old."
 			}
 
-			log.Printf("%v messages deleted \n", deletedMSG)
+			log.Println(deletedMSG)
 
 			embed := embed.NewEmbed().
 				SetTitle(deletedMSG).
