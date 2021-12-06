@@ -1,23 +1,36 @@
 package bot
 
 import (
+	"archroid/ElProfessorBot/structs"
 	embed "archroid/ElProfessorBot/utils"
-	"time"
+	"context"
+	"fmt"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func guildMemberAdd(session *discordgo.Session, member *discordgo.GuildMemberAdd) {
-	userId := member.User.ID
-	println(userId)
-	ping := session.HeartbeatLatency().Truncate(60).Round(time.Millisecond)
+	var welcomeMessage structs.WelcomeMessage
+	guildID := member.GuildID
 
-	embed := embed.NewEmbed().
-		SetColor(0xff0000).
-		SetTitle("🏓").
-		SetDescription(`Pong: **` + ping.String() + `** `).
-		MessageEmbed
-	session.ChannelMessageSendEmbed("901736923012431892", embed)
+	filter := bson.M{"guildid": guildID}
+	err := db.Collection("welcome").FindOne(context.TODO(), filter).Decode(&welcomeMessage)
+	if err != nil {
+		log.Println(err)
+	} else {
+		embed := embed.NewEmbed().
+			SetColor(0x372168).
+			// SetThumbnail().
+			SetTitle("👋Welcome!").
+			SetImage(member.User.AvatarURL("48")).
+			SetDescription(fmt.Sprintf("Welcome to %v , %v \n %v", "this server", member.User.Username, welcomeMessage.WelcomeMessage)).
+			MessageEmbed
+		session.ChannelMessageSendEmbed(welcomeMessage.WelcomeChannelId, embed)
+
+	}
+
 }
 
 func ready(session *discordgo.Session, event *discordgo.Ready) {

@@ -7,11 +7,15 @@ import (
 	"os/signal"
 
 	"github.com/bwmarrin/discordgo"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var session *discordgo.Session
+var (
+	session *discordgo.Session
+	db      *mongo.Database
+)
 
-func Start(token string) {
+func Start(token string, database *mongo.Database) {
 
 	session, err := discordgo.New("Bot " + token)
 	if err != nil {
@@ -22,6 +26,7 @@ func Start(token string) {
 	session.AddHandler(guildMemberAdd)
 	session.AddHandler(ready)
 	session.AddHandler(command)
+	session.Identify.Intents |= discordgo.IntentsGuildMembers
 	// session.AddHandler(message)
 
 	defer session.Close()
@@ -33,6 +38,8 @@ func Start(token string) {
 
 	addCommands(session, commands)
 
+	db = database
+
 	stop := make(chan os.Signal)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
@@ -40,5 +47,3 @@ func Start(token string) {
 	deleteAllCommands(session)
 
 }
-
-
