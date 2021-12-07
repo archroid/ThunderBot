@@ -31,13 +31,14 @@ func Start(token string, database *mongo.Database) {
 	// session.AddHandler(message)
 
 	defer session.Close()
+
 	if err = session.Open(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	log.Printf("Bot is online: %v guilds \n", len(session.State.Guilds))
-
 	addCommands(session, commands)
+
+	log.Printf("Bot is online: %v guilds in \n", len(session.State.Guilds))
 
 	db = database
 
@@ -45,6 +46,7 @@ func Start(token string, database *mongo.Database) {
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("Gracefully shutdowning")
-	deleteAllCommands(session)
+
+	// deleteAllCommands(session)
 
 }

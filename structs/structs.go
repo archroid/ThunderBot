@@ -10,3 +10,8 @@ type Role struct {
 	RoleID  string
 	GuildID string
 }
+
+type Rules struct {
+	Rules   string
+	GuildID string
+}
