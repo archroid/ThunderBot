@@ -27,6 +27,7 @@ func Start(token string, database *mongo.Database) {
 	session.AddHandler(ready)
 	session.AddHandler(command)
 	session.Identify.Intents |= discordgo.IntentsGuildMembers
+	session.Identify.Intents |= discordgo.IntentsDirectMessageReactions
 	// session.AddHandler(message)
 
 	defer session.Close()

@@ -13,6 +13,7 @@ import (
 
 func guildMemberAdd(session *discordgo.Session, member *discordgo.GuildMemberAdd) {
 	var welcomeMessage structs.WelcomeMessage
+	var autoRole structs.Role
 	guildID := member.GuildID
 
 	filter := bson.M{"guildid": guildID}
@@ -24,11 +25,20 @@ func guildMemberAdd(session *discordgo.Session, member *discordgo.GuildMemberAdd
 			SetColor(0x372168).
 			// SetThumbnail().
 			SetTitle("👋Welcome!").
-			SetImage(member.User.AvatarURL("48")).
+			SetImage(member.User.AvatarURL("24")).
 			SetDescription(fmt.Sprintf("Welcome to %v , %v \n %v", "this server", member.User.Username, welcomeMessage.WelcomeMessage)).
 			MessageEmbed
 		session.ChannelMessageSendEmbed(welcomeMessage.WelcomeChannelId, embed)
+	}
 
+	err = db.Collection("auto-role").FindOne(context.TODO(), filter).Decode(&autoRole)
+	if err != nil {
+		log.Println(err)
+	} else {
+		err := session.GuildMemberRoleAdd(guildID, member.User.ID, autoRole.RoleID)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 }
