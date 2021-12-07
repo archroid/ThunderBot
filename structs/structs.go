@@ -5,3 +5,8 @@ type WelcomeMessage struct {
 	WelcomeMessage   string
 	GuildId          string
 }
+
+type Role struct {
+	RoleID  string
+	GuildID string
+}

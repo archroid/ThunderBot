@@ -60,6 +60,25 @@ var (
 				},
 			},
 		},
+
+		{
+			Name:        "auto-role",
+			Description: "give a special role to anyone that joins the crew!",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionBoolean,
+					Name:        "enabled",
+					Description: "Enable or disable auto-roling system.",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionRole,
+					Name:        "role",
+					Description: "The role you want to set.",
+					Required:    false,
+				},
+			},
+		},
 	}
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -170,6 +189,8 @@ var (
 								Embeds:  embeds,
 							},
 						})
+						time.Sleep(time.Second * 2)
+						s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 					} else {
 						embed := embed.NewEmbed().
 							SetColor(0x00ff00).
@@ -186,6 +207,8 @@ var (
 								Embeds:  embeds,
 							},
 						})
+						time.Sleep(time.Second * 2)
+						s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 					}
 				} else {
 					embed := embed.NewEmbed().
@@ -203,6 +226,8 @@ var (
 							Embeds:  embeds,
 						},
 					})
+					time.Sleep(time.Second * 2)
+					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 				}
 
 			} else {
@@ -230,8 +255,109 @@ var (
 						Embeds:  embeds,
 					},
 				})
+				time.Sleep(time.Second * 2)
+				s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 			}
+		},
+		"auto-role": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			if i.ApplicationCommandData().Options[0].BoolValue() {
+				if len(i.ApplicationCommandData().Options) == 2 {
+					guildId := i.GuildID
+					roleID := i.ApplicationCommandData().Options[1].RoleValue(session, guildId).ID
 
+					//remove previous settings from database
+					filter := bson.M{"guildid": guildId}
+
+					_, err := db.Collection("auto-role").DeleteOne(context.TODO(), filter)
+					if err != nil {
+						log.Println(err)
+					}
+					insertRole := structs.Role{roleID, guildId}
+					_, err = db.Collection("auto-role").InsertOne(context.TODO(), insertRole)
+					if err != nil {
+						embed := embed.NewEmbed().
+							SetColor(0xff0000).
+							SetTitle("🔴Error!").
+							SetDescription(`Error setting welcome message`).
+							MessageEmbed
+
+						embeds := []*discordgo.MessageEmbed{embed}
+
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: "",
+								Embeds:  embeds,
+							},
+						})
+						time.Sleep(time.Second * 2)
+						s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+					} else {
+						embed := embed.NewEmbed().
+							SetColor(0x00ff00).
+							SetTitle("✅Done!").
+							SetDescription(`auto-role settings saved!`).
+							MessageEmbed
+
+						embeds := []*discordgo.MessageEmbed{embed}
+
+						s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+							Type: discordgo.InteractionResponseChannelMessageWithSource,
+							Data: &discordgo.InteractionResponseData{
+								Content: "",
+								Embeds:  embeds,
+							},
+						})
+						time.Sleep(time.Second * 2)
+						s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+					}
+				} else {
+					embed := embed.NewEmbed().
+						SetColor(0xff0000).
+						SetTitle("🔴Error!").
+						SetDescription(`You should fill all fields!`).
+						MessageEmbed
+
+					embeds := []*discordgo.MessageEmbed{embed}
+
+					s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+						Type: discordgo.InteractionResponseChannelMessageWithSource,
+						Data: &discordgo.InteractionResponseData{
+							Content: "",
+							Embeds:  embeds,
+						},
+					})
+					time.Sleep(time.Second * 2)
+					s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+				}
+			} else {
+				guildId := i.GuildID
+
+				filter := bson.M{"guildid": guildId}
+
+				_, err := db.Collection("auto-role").DeleteOne(context.TODO(), filter)
+				if err != nil {
+					log.Println(err)
+				}
+
+				embed := embed.NewEmbed().
+					SetColor(0x00ff00).
+					SetTitle("🟢Done!").
+					SetDescription(`I won't give roles to members when they join on this server anymore!`).
+					MessageEmbed
+
+				embeds := []*discordgo.MessageEmbed{embed}
+
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "",
+						Embeds:  embeds,
+					},
+				})
+				time.Sleep(time.Second * 2)
+				s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+			}
 		},
 	}
 )
