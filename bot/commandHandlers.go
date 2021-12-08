@@ -103,7 +103,8 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 					log.Println(err)
 				}
 
-				insertWelcome := structs.WelcomeMessage{welcomeChannelId, welcomeMessage, guildId}
+				// insertWelcome := structs.WelcomeMessage{welcomeChannelId, welcomeMessage, guildId}
+				insertWelcome := structs.WelcomeMessage{WelcomeChannelId: welcomeChannelId, WelcomeMessage: welcomeMessage, GuildId: guildId}
 				_, err = db.Collection("welcome").InsertOne(context.TODO(), insertWelcome)
 				if err != nil {
 					embed := embed.NewEmbed().
@@ -204,7 +205,8 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				if err != nil {
 					log.Println(err)
 				}
-				insertRole := structs.Role{roleID, guildId}
+				// insertRole := structs.Role{roleID, guildId}
+				insertRole := structs.Role{RoleID: roleID, GuildID: guildId}
 				_, err = db.Collection("auto-role").InsertOne(context.TODO(), insertRole)
 				if err != nil {
 					embed := embed.NewEmbed().
@@ -311,7 +313,9 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			log.Println(err)
 		}
 
-		insertRules := structs.Rules{rules, i.GuildID}
+		// insertRules := structs.Rules{rules, i.GuildID}
+		insertRules := structs.Rules{Rules: rules, GuildID: i.GuildID}
+
 		_, err = db.Collection("rules").InsertOne(context.TODO(), insertRules)
 		if err != nil {
 			embed := embed.NewEmbed().

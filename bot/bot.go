@@ -42,7 +42,8 @@ func Start(token string, database *mongo.Database) {
 
 	db = database
 
-	stop := make(chan os.Signal)
+	// Shutdown
+	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("Gracefully shutdowning")
