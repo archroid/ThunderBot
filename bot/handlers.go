@@ -5,9 +5,9 @@ import (
 	embed "archroid/ElProfessorBot/utils"
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

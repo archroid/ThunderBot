@@ -3,15 +3,19 @@ package bot
 import (
 	"archroid/ElProfessorBot/structs"
 	embed "archroid/ElProfessorBot/utils"
+	"archroid/ElProfessorBot/youtubemusic"
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
 	"go.mongodb.org/mongo-driver/bson"
 )
+
+var vc *discordgo.VoiceConnection
 
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 	"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -397,6 +401,94 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				Content: "https://elprofessorbot.archroid.xyz",
 			},
 		})
+
+	},
+
+	"join": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		VoiceConnection, err := s.ChannelVoiceJoin(i.GuildID, i.ApplicationCommandData().Options[0].ChannelValue(session).ID, false, true)
+		if err != nil {
+			log.Println(err)
+			embed := embed.NewEmbed().
+				SetColor(0xff0000).
+				SetTitle("🔴Error!").
+				SetDescription(`Error joining the voice`).
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+					Embeds:  embeds,
+				},
+			})
+			time.Sleep(time.Second * 2)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+
+		} else {
+			embed := embed.NewEmbed().
+				SetColor(0x00ff00).
+				SetTitle("✅Done!").
+				SetDescription(`Joined the voice`).
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+					Embeds:  embeds,
+				},
+			})
+			vc = VoiceConnection
+
+			time.Sleep(time.Second * 2)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+		}
+
+	},
+
+	"disconnect": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		vc.Disconnect()
+
+		embed := embed.NewEmbed().
+			SetColor(0x00ff00).
+			SetTitle("✅Done!").
+			SetDescription(`Disconnected`).
+			MessageEmbed
+
+		embeds := []*discordgo.MessageEmbed{embed}
+
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "",
+				Embeds:  embeds,
+			},
+		})
+		time.Sleep(time.Second * 2)
+		s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+	},
+
+	"play": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		musicInput := i.ApplicationCommandData().Options[0].StringValue()
+
+		youtubeID, err := youtubemusic.GetVideoID(musicInput)
+		if err != nil {
+			log.Println(err)
+		} else {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: youtubeID,
+				},
+			})
+		}
+
+	},
+	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	},
 }

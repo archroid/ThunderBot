@@ -1,9 +1,8 @@
 package bot
 
 import (
-	"log"
-
 	"github.com/bwmarrin/discordgo"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -108,6 +107,41 @@ var (
 		{
 			Name:        "help",
 			Description: "Help",
+		},
+
+		{
+			Name:        "join",
+			Description: "Join to the voice channel.",
+			Options: []*discordgo.ApplicationCommandOption{
+
+				{
+					Type:        discordgo.ApplicationCommandOptionChannel,
+					Required:    true,
+					Name:        "voice-channel",
+					Description: "Voice Channel you want me to join.",
+				},
+			},
+		},
+
+		{
+			Name:        "disconnect",
+			Description: "Disconnect from the voice channel.",
+		},
+		{
+			Name:        "play",
+			Description: "Play the youtube video.",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "music",
+					Description: "Enter music name or URL",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "stop",
+			Description: "Stop the current playing song",
 		},
 	}
 )

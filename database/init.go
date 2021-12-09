@@ -2,8 +2,8 @@ package database
 
 import (
 	"context"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
