@@ -478,14 +478,27 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 		youtubeID, err := youtubemusic.GetVideoID(musicInput)
 		if err != nil {
 			log.Println(err)
-		} else {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: youtubeID,
-				},
-			})
 		}
+		youtubemusic.Download(youtubeID, vc)
+		// else {
+
+		// 	title, err := youtubemusic.Download(youtubeID)
+		// 	if err != nil {
+		// 		log.Error(err)
+		// 	}
+		// 	err = youtubemusic.PlayMusic(youtubeID, vc)
+		// 	if err != nil {
+		// 		log.Error(err)
+		// 	}
+
+		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		// 		Data: &discordgo.InteractionResponseData{
+		// 			Content: title,
+		// 		},
+		// 	})
+
+		// }
 
 	},
 	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
