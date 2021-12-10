@@ -18,18 +18,21 @@ var (
 
 func Start(token string, database *mongo.Database) {
 
+	db = database
+
 	session, err := discordgo.New("Bot " + token)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	session.AddHandler(guildMemberAdd)
-	session.AddHandler(ready)
-	session.AddHandler(command)
 	session.Identify.Intents |= discordgo.IntentsGuildMembers
 	session.Identify.Intents |= discordgo.IntentsDirectMessageReactions
-	// session.AddHandler(message)
+	session.AddHandler(guildMemberAdd)
+	session.AddHandler(ready)
+	// session.AddHandler(command)
+
+	session.AddHandler(message)
 
 	defer session.Close()
 
@@ -39,9 +42,7 @@ func Start(token string, database *mongo.Database) {
 	}
 	addCommands(session, commands)
 
-	log.Printf("Bot is online: %v guilds in \n", len(session.State.Guilds))
-
-	db = database
+	log.Printf("Bot is online: %v guilds \n", len(session.State.Guilds))
 
 	// Shutdown
 	stop := make(chan os.Signal, 1)

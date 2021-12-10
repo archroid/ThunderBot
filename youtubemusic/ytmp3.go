@@ -2,7 +2,6 @@ package youtubemusic
 
 import (
 	"errors"
-	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -11,8 +10,6 @@ import (
 
 	utils "archroid/ElProfessorBot/utils"
 
-	"github.com/bwmarrin/discordgo"
-	"github.com/jonas747/dca"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 
@@ -25,7 +22,7 @@ const AudioPath = "audio-cache"
 
 var ytID string
 
-func Download(youtubeID string, vc *discordgo.VoiceConnection) (title string, err error) {
+func Download(youtubeID string) (title string, err error) {
 	os.Mkdir(AudioPath, 0777)
 
 	client := ytmeta.Client{
@@ -48,63 +45,14 @@ func Download(youtubeID string, vc *discordgo.VoiceConnection) (title string, er
 	} else {
 		err = handleVideoFormat(client, video, format)
 	}
+
 	if err != nil {
 		return "", err
-	}
-
-	options := dca.StdEncodeOptions
-	options.RawOutput = true
-	options.Bitrate = 96
-	options.Application = "lowdelay"
-
-	encodingSession, err := dca.EncodeFile(format.URL, options)
-	if err != nil {
-		log.Println(err)
-	}
-	defer encodingSession.Cleanup()
-
-	done := make(chan error)
-	dca.NewStream(encodingSession, vc, done)
-	err = <-done
-	if err != nil && err != io.EOF {
-		log.Println(err)
 	}
 
 	ytID = youtubeID
 	return title, nil
 }
-
-// func Download(youtubeID string) (title string, err error) {
-// 	os.Mkdir(AudioPath, 0777)
-
-// 	client := ytmeta.Client{
-// 		HTTPClient: http.DefaultClient,
-// 	}
-// 	video, err := client.GetVideo(youtubeID)
-// 	if err != nil {
-// 		log.Error("Failed to get video info: " + err.Error())
-// 		return "", errors.New("video ID is invalid")
-// 	}
-// 	title = video.Title
-// 	if err := utils.VideoDurationValid(video.Duration); err != nil {
-// 		return "", err
-// 	}
-
-// 	format, audioFormatFound := findAudioFormat(video.Formats)
-
-// 	if audioFormatFound {
-// 		err = handleAudioFormat(client, video, format)
-// 	} else {
-// 		err = handleVideoFormat(client, video, format)
-// 	}
-
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	ytID = youtubeID
-// 	return title, nil
-// }
 
 func findAudioFormat(formats ytmeta.FormatList) (*ytmeta.Format, bool) {
 	if format, found := filterFormatListByMime(formats, "audio/mp4"); found {

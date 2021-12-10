@@ -34,15 +34,21 @@ type YoutubeService struct {
 // with the given api key.
 // GetVideoID returns the first youtubeID of a
 // video that matches the query
-func GetVideoID(query string) (youtubeID string, err error) {
 
+func start() {
 	ctx := context.Background()
 	youtubeService, err := youtube.NewService(ctx, option.WithAPIKey(os.Getenv("YOUTUBE_API_KEY")))
 	if err != nil {
 		log.Fatal(err)
 	}
-	searchService := youtubeService.Search
+	searchService = youtubeService.Search
 	log.Println("Sucessfully initialised Youtube Search Service.")
+}
+
+func GetVideoID(query string) (youtubeID string, err error) {
+	if searchService == nil {
+		start()
+	}
 
 	call := searchService.List([]string{"id, snippet"}).
 		Type("video").

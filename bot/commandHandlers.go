@@ -405,49 +405,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	},
 
 	"join": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		VoiceConnection, err := s.ChannelVoiceJoin(i.GuildID, i.ApplicationCommandData().Options[0].ChannelValue(session).ID, false, true)
-		if err != nil {
-			log.Println(err)
-			embed := embed.NewEmbed().
-				SetColor(0xff0000).
-				SetTitle("🔴Error!").
-				SetDescription(`Error joining the voice`).
-				MessageEmbed
-
-			embeds := []*discordgo.MessageEmbed{embed}
-
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-					Embeds:  embeds,
-				},
-			})
-			time.Sleep(time.Second * 2)
-			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
-
-		} else {
-			embed := embed.NewEmbed().
-				SetColor(0x00ff00).
-				SetTitle("✅Done!").
-				SetDescription(`Joined the voice`).
-				MessageEmbed
-
-			embeds := []*discordgo.MessageEmbed{embed}
-
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-					Embeds:  embeds,
-				},
-			})
-			vc = VoiceConnection
-
-			time.Sleep(time.Second * 2)
-			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
-		}
-
+		joinVoice(s, i)
 	},
 
 	"disconnect": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -473,35 +431,86 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	},
 
 	"play": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
 		musicInput := i.ApplicationCommandData().Options[0].StringValue()
 
-		youtubeID, err := youtubemusic.GetVideoID(musicInput)
+		videoID, err := youtubemusic.GetVideoID(musicInput)
 		if err != nil {
 			log.Println(err)
 		}
-		youtubemusic.Download(youtubeID, vc)
-		// else {
-
-		// 	title, err := youtubemusic.Download(youtubeID)
-		// 	if err != nil {
-		// 		log.Error(err)
-		// 	}
-		// 	err = youtubemusic.PlayMusic(youtubeID, vc)
-		// 	if err != nil {
-		// 		log.Error(err)
-		// 	}
-
-		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		// 		Data: &discordgo.InteractionResponseData{
-		// 			Content: title,
-		// 		},
-		// 	})
-
-		// }
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: fmt.Sprintf("video URL: https://www.youtube.com/watch?v=%v", videoID),
+			},
+		})
+		joinVoice(s, i)
+		
 
 	},
 	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	},
+}
+
+func joinVoice(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	guild, _ := s.State.Guild(i.GuildID)
+	var channel *discordgo.Channel
+
+	if getCurrentVoiceChannel(i.Member.User, s, guild) == nil {
+		log.Println("You are not connected to a voice channel.")
+		embed := embed.NewEmbed().
+			SetColor(0xff0000).
+			SetTitle("🔴Error!").
+			SetDescription(`You are not connected to a voice channel.`).
+			MessageEmbed
+
+		embeds := []*discordgo.MessageEmbed{embed}
+
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "",
+				Embeds:  embeds,
+			},
+		})
+		time.Sleep(time.Second * 3)
+		s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+	} else {
+		channel = getCurrentVoiceChannel(i.Member.User, s, guild)
+		VoiceConnection, err := s.ChannelVoiceJoin(i.GuildID, channel.ID, false, true)
+		if err != nil {
+			log.Println(err)
+			embed := embed.NewEmbed().
+				SetColor(0xff0000).
+				SetTitle("🔴Error!").
+				SetDescription(`Error joining the voice`).
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+					Embeds:  embeds,
+				},
+			})
+			time.Sleep(time.Second * 3)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+
+		} else {
+			vc = VoiceConnection
+		}
+	}
+}
+
+func getCurrentVoiceChannel(user *discordgo.User, session *discordgo.Session, guild *discordgo.Guild) *discordgo.Channel {
+	for _, vs := range guild.VoiceStates {
+		if vs.UserID == user.ID {
+			channel, _ := session.Channel(vs.ChannelID)
+			return channel
+		}
+	}
+	return nil
 }

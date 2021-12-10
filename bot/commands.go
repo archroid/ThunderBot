@@ -112,15 +112,6 @@ var (
 		{
 			Name:        "join",
 			Description: "Join to the voice channel.",
-			Options: []*discordgo.ApplicationCommandOption{
-
-				{
-					Type:        discordgo.ApplicationCommandOptionChannel,
-					Required:    true,
-					Name:        "voice-channel",
-					Description: "Voice Channel you want me to join.",
-				},
-			},
 		},
 
 		{
