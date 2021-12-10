@@ -20,7 +20,7 @@
 
 ## About
 
-ElProfessorBot is a powerful [Discord](https://discord.com/) bot that allows you to easily manage your discord server written with [DiscordGo](https://github.com/bwmarrin/discordgo) and [Mongodb](https://github.com/mongodb/mongo-go-driver).
+ElProfessorBot is a powerful [Discord](https://discord.com/) bot that allows you to easily manage your discord server and play music from youtube written with [DiscordGo](https://github.com/bwmarrin/discordgo) and [Mongodb](https://github.com/mongodb/mongo-go-driver).
 
 - Play musics from youtube API
 - Polls and predictions
