@@ -445,11 +445,24 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			},
 		})
 		joinVoice(s, i)
-		
 
 	},
 	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
+	},
+	"search": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		musicInput := i.ApplicationCommandData().Options[0].StringValue()
+
+		videoID, err := youtubemusic.GetVideoID(musicInput)
+		if err != nil {
+			log.Println(err)
+		}
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: fmt.Sprintf("https://www.youtube.com/watch?v=%v", videoID),
+			},
+		})
 	},
 }
 

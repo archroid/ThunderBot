@@ -134,6 +134,19 @@ var (
 			Name:        "stop",
 			Description: "Stop the current playing song",
 		},
+
+		{
+			Name:        "search",
+			Description: "Search for video from youtube",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "search",
+					Description: "search query",
+					Required:    true,
+				},
+			},
+		},
 	}
 )
 
