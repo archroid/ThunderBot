@@ -158,6 +158,13 @@ var (
 					Description: "Description of the poll",
 					Required:    true,
 				},
+
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "duration",
+					Description: "Poll duration in minutes (0 for unlimited)",
+					Required:    true,
+				},
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
 					Name:        "option1",

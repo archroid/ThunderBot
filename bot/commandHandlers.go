@@ -1,11 +1,13 @@
 package bot
 
 import (
+	"archroid/ElProfessorBot/poll"
 	"archroid/ElProfessorBot/structs"
 	embed "archroid/ElProfessorBot/utils"
 	"archroid/ElProfessorBot/youtubemusic"
 	"context"
 	"fmt"
+
 	"math/rand"
 	"time"
 
@@ -465,7 +467,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 		})
 	},
 	"poll": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
+		poll.CreatePoll(s, i)
 	},
 }
 
