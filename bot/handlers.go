@@ -5,10 +5,6 @@ import (
 	embed "archroid/ElProfessorBot/utils"
 	"context"
 	"fmt"
-	"runtime"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 	log "github.com/sirupsen/logrus"
@@ -20,23 +16,16 @@ func guildMemberAdd(session *discordgo.Session, member *discordgo.GuildMemberAdd
 	var autoRole structs.Role
 	guildID := member.GuildID
 
-	if db == nil {
-		log.Println("db is nill")
-	}
-
 	filter := bson.M{"guildid": guildID}
-
 	err := db.Collection("welcome").FindOne(context.TODO(), filter).Decode(&welcomeMessage)
 	if err != nil {
 		log.Println(err)
 	} else {
-		guild, _ := session.State.Guild(guildID)
-
 		embed := embed.NewEmbed().
 			SetColor(0x372168).
-			SetThumbnail(guild.Icon).
+			// SetThumbnail().
 			SetTitle("👋Welcome!").
-			SetImage(member.User.AvatarURL("24")).
+			SetImage(member.User.AvatarURL("300")).
 			SetDescription(fmt.Sprintf("Welcome to %v , %v \n %v", "this server", member.User.Username, welcomeMessage.WelcomeMessage)).
 			MessageEmbed
 		session.ChannelMessageSendEmbed(welcomeMessage.WelcomeChannelId, embed)
@@ -44,11 +33,11 @@ func guildMemberAdd(session *discordgo.Session, member *discordgo.GuildMemberAdd
 
 	err = db.Collection("auto-role").FindOne(context.TODO(), filter).Decode(&autoRole)
 	if err != nil {
-		log.Printf("auto-role: %v", err)
+		log.Println(err)
 	} else {
 		err := session.GuildMemberRoleAdd(guildID, member.User.ID, autoRole.RoleID)
 		if err != nil {
-			log.Printf("auto-role: %v", err)
+			log.Println(err)
 		}
 	}
 
@@ -64,94 +53,94 @@ func command(session *discordgo.Session, i *discordgo.InteractionCreate) {
 	}
 }
 
-func message(bot *discordgo.Session, message *discordgo.MessageCreate) {
-	if message.Author.Bot {
-		return
-	}
+// func message(bot *discordgo.Session, message *discordgo.MessageCreate) {
+// 	if message.Author.Bot {
+// 		return
+// 	}
 
-	switch {
-	case strings.HasPrefix(message.Content, "&"):
-		ping := bot.HeartbeatLatency().Truncate(60).Round(time.Millisecond)
-		if message.Content == "&ping" {
+// 	switch {
+// 	case strings.HasPrefix(message.Content, "&"):
+// 		ping := bot.HeartbeatLatency().Truncate(60).Round(time.Millisecond)
+// 		if message.Content == "&ping" {
 
-			embed := embed.NewEmbed().
-				SetColor(0xff0000).
-				SetTitle("🏓").
-				SetDescription(`Pong: **` + ping.String() + `** `).
-				MessageEmbed
-			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
-		}
+// 			embed := embed.NewEmbed().
+// 				SetColor(0xff0000).
+// 				SetTitle("🏓").
+// 				SetDescription(`Pong: **` + ping.String() + `** `).
+// 				MessageEmbed
+// 			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
+// 		}
 
-		if message.Content == "&github" {
-			embed := embed.NewEmbed().
-				SetAuthor(message.Author.Username, message.Author.AvatarURL("1024")).
-				SetThumbnail(message.Author.AvatarURL("1024")).
-				SetTitle("My repository").
-				SetDescription("You can find my repository by clicking [here](https://github.com/archroid).").
-				SetColor(0x00ff00).MessageEmbed
-			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
-		}
-		if message.Content == "&botinfo" {
-			guilds := len(bot.State.Guilds)
-			embed := embed.NewEmbed().
-				SetTitle("ElProfessor Bot").
-				SetColor(0x372168).
-				SetThumbnail("https://cdn.discordapp.com/avatars/901356147720749096/3107c752e9bc40bcb9dd0100bd53976b.png").
-				SetDescription("Some informations about me :)").
-				SetAuthor("Professor#9681", "https://cdn.discordapp.com/avatars/782162374890487810/32a321b1b588f2126aec41b833030590.png").
-				AddField("GO version:", runtime.Version()).
-				AddField("DiscordGO version:", discordgo.VERSION).
-				AddField("Concurrent tasks:", strconv.Itoa(runtime.NumGoroutine())).
-				AddField("📡Latency:", ping.String()).
-				AddField("Author:", "Made with ❤️ by Professor#9681").
-				AddField("Invitation Link:", "https://b2n.ir/n97207").
-				AddField("Total guilds:", strconv.Itoa(guilds)).MessageEmbed
-			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
+// 		if message.Content == "&github" {
+// 			embed := embed.NewEmbed().
+// 				SetAuthor(message.Author.Username, message.Author.AvatarURL("1024")).
+// 				SetThumbnail(message.Author.AvatarURL("1024")).
+// 				SetTitle("My repository").
+// 				SetDescription("You can find my repository by clicking [here](https://github.com/archroid).").
+// 				SetColor(0x00ff00).MessageEmbed
+// 			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
+// 		}
+// 		if message.Content == "&botinfo" {
+// 			guilds := len(bot.State.Guilds)
+// 			embed := embed.NewEmbed().
+// 				SetTitle("ElProfessor Bot").
+// 				SetColor(0x372168).
+// 				SetThumbnail("https://cdn.discordapp.com/avatars/901356147720749096/3107c752e9bc40bcb9dd0100bd53976b.png").
+// 				SetDescription("Some informations about me :)").
+// 				SetAuthor("Professor#9681", "https://cdn.discordapp.com/avatars/782162374890487810/32a321b1b588f2126aec41b833030590.png").
+// 				AddField("GO version:", runtime.Version()).
+// 				AddField("DiscordGO version:", discordgo.VERSION).
+// 				AddField("Concurrent tasks:", strconv.Itoa(runtime.NumGoroutine())).
+// 				AddField("📡Latency:", ping.String()).
+// 				AddField("Author:", "Made with ❤️ by Professor#9681").
+// 				AddField("Invitation Link:", "https://b2n.ir/n97207").
+// 				AddField("Total guilds:", strconv.Itoa(guilds)).MessageEmbed
+// 			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
 
-		}
+// 		}
 
-		if message.Content == "&clear" {
+// 		if message.Content == "&clear" {
 
-			st, err := bot.ChannelMessages(message.ChannelID, 99, message.Reference().MessageID, "", "")
-			if err != nil {
-				log.Panicln(err)
-				return
-			}
+// 			st, err := bot.ChannelMessages(message.ChannelID, 99, message.Reference().MessageID, "", "")
+// 			if err != nil {
+// 				log.Panicln(err)
+// 				return
+// 			}
 
-			var messageIds []string
-			for _, strings := range st {
-				messageIds = append(messageIds, strings.Reference().MessageID)
-			}
+// 			var messageIds []string
+// 			for _, strings := range st {
+// 				messageIds = append(messageIds, strings.Reference().MessageID)
+// 			}
 
-			messageIds = append(messageIds, message.Reference().MessageID)
+// 			messageIds = append(messageIds, message.Reference().MessageID)
 
-			log.Printf("msgid %v", 0)
-			log.Printf("%v messages deleted \n", len(messageIds))
+// 			log.Printf("msgid %v", 0)
+// 			log.Printf("%v messages deleted \n", len(messageIds))
 
-			//Delete messages
-			bot.ChannelMessagesBulkDelete(message.ChannelID, messageIds)
+// 			//Delete messages
+// 			bot.ChannelMessagesBulkDelete(message.ChannelID, messageIds)
 
-			//Say the user about deleted messagess
-			embed := embed.NewEmbed().
-				SetTitle(fmt.Sprintf("%v messages has been deleted!", len(messageIds))).
-				SetColor(0xff0000).
-				MessageEmbed
-			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
+// 			//Say the user about deleted messagess
+// 			embed := embed.NewEmbed().
+// 				SetTitle(fmt.Sprintf("%v messages has been deleted!", len(messageIds))).
+// 				SetColor(0xff0000).
+// 				MessageEmbed
+// 			bot.ChannelMessageSendEmbed(message.ChannelID, embed)
 
-			//Delete the message itself
-			embedMessage, err := bot.ChannelMessages(message.ChannelID, 1, "", "", "")
-			if err != nil {
-				log.Panicln(err)
-				return
-			}
-			println(len(embedMessage))
-			embedMessageString := embedMessage[0].Reference().MessageID
+// 			//Delete the message itself
+// 			embedMessage, err := bot.ChannelMessages(message.ChannelID, 1, "", "", "")
+// 			if err != nil {
+// 				log.Panicln(err)
+// 				return
+// 			}
+// 			println(len(embedMessage))
+// 			embedMessageString := embedMessage[0].Reference().MessageID
 
-			//wait 3 seconds
-			time.Sleep(time.Second * 2)
+// 			//wait 3 seconds
+// 			time.Sleep(time.Second * 2)
 
-			bot.ChannelMessageDelete(message.ChannelID, embedMessageString)
+// 			bot.ChannelMessageDelete(message.ChannelID, embedMessageString)
 
-		}
-	}
-}
+// 		}
+// 	}
+// }
