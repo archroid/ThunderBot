@@ -147,6 +147,79 @@ var (
 				},
 			},
 		},
+
+		{
+			Name:        "poll",
+			Description: "Create a new poll",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "topic",
+					Description: "Description of the poll",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option1",
+					Description: "Option 1",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option2",
+					Description: "Option 2",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option3",
+					Description: "Option 3",
+					Required:    false,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option4",
+					Description: "Option 4",
+					Required:    false,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option5",
+					Description: "Option 5",
+					Required:    false,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option6",
+					Description: "Option 6",
+					Required:    false,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option7",
+					Description: "Option 7",
+					Required:    false,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option8",
+					Description: "Option 8",
+					Required:    false,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option9",
+					Description: "Option 9",
+					Required:    false,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "option10",
+					Description: "Option 10",
+					Required:    false,
+				},
+			},
+		},
 	}
 )
 

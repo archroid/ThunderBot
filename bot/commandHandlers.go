@@ -464,6 +464,9 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			},
 		})
 	},
+	"poll": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+	},
 }
 
 func joinVoice(s *discordgo.Session, i *discordgo.InteractionCreate) {
