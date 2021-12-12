@@ -71,7 +71,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 		err = s.ChannelMessagesBulkDelete(i.ChannelID, messageIds)
 
 		if err != nil {
-			deletedMSG = "You can only bulk delete messages that are under 14 days old."
+			deletedMSG = "You can only delete messages that are under 14 days old."
 		}
 
 		embed := embed.NewEmbed().

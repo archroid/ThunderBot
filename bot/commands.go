@@ -6,8 +6,6 @@ import (
 )
 
 var (
-	guildCommand string = "801840788022624296"
-
 	commands = []*discordgo.ApplicationCommand{
 		{
 			Name: "ping",
@@ -233,7 +231,7 @@ var (
 func addCommands(session *discordgo.Session, commands []*discordgo.ApplicationCommand) {
 	var commandNum = 0
 	for _, v := range commands {
-		_, err := session.ApplicationCommandCreate(session.State.User.ID, guildCommand, v)
+		_, err := session.ApplicationCommandCreate(session.State.User.ID, "", v)
 		if err != nil {
 			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
 		} else {
@@ -245,10 +243,10 @@ func addCommands(session *discordgo.Session, commands []*discordgo.ApplicationCo
 }
 
 func deleteAllCommands(session *discordgo.Session) {
-	commands, _ := session.ApplicationCommands(session.State.User.ID, guildCommand)
+	commands, _ := session.ApplicationCommands(session.State.User.ID, "")
 	var commandNum = 0
 	for _, v := range commands {
-		err := session.ApplicationCommandDelete(session.State.User.ID, guildCommand, v.ID)
+		err := session.ApplicationCommandDelete(session.State.User.ID, "", v.ID)
 		if err != nil {
 			log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
 		} else {

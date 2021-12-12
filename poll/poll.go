@@ -10,8 +10,6 @@ import (
 
 func CreatePoll(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
-	// var poll Poll
-
 	topic := i.ApplicationCommandData().Options[0].StringValue()
 
 	optionsNum := len(i.ApplicationCommandData().Options) - 2
@@ -23,8 +21,7 @@ func CreatePoll(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	if optionsNum >= 3 {
 		pollContent = pollContent + fmt.Sprintf("\n3️⃣ %v ", i.ApplicationCommandData().Options[4].StringValue())
-		// println(i.ApplicationCommandData().Options[4].StringValue())
-		// println(pollContent)
+
 	}
 	if optionsNum >= 4 {
 		pollContent = pollContent + fmt.Sprintf("\n4️⃣ %v ", i.ApplicationCommandData().Options[5].StringValue())
@@ -67,8 +64,5 @@ func CreatePoll(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			Embeds: embeds,
 		},
 	})
-
-	// time.Sleep(time.Duration(duration))
-	// println(time.Duration(duration).Minutes())
 
 }

@@ -23,9 +23,9 @@ func guildMemberAdd(session *discordgo.Session, member *discordgo.GuildMemberAdd
 	} else {
 		embed := embed.NewEmbed().
 			SetColor(0x372168).
-			// SetThumbnail().
 			SetTitle("👋Welcome!").
-			SetImage(member.User.AvatarURL("300")).
+			SetAuthor(member.User.Username, member.User.AvatarURL("24")).
+			// SetImage(member.User.AvatarURL("300")).
 			SetDescription(fmt.Sprintf("Welcome to %v , %v \n %v", "this server", member.User.Username, welcomeMessage.WelcomeMessage)).
 			MessageEmbed
 		session.ChannelMessageSendEmbed(welcomeMessage.WelcomeChannelId, embed)

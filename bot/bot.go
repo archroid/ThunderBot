@@ -37,7 +37,7 @@ func Start(token string, database *mongo.Database) {
 		fmt.Println(err)
 		return
 	}
-	addCommands(session, commands)
+	// addCommands(session, commands)
 
 	log.Printf("Bot is online: %v guilds \n", len(session.State.Guilds))
 
