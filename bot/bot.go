@@ -27,9 +27,8 @@ func Start(token string, database *mongo.Database) {
 	session.AddHandler(guildMemberAdd)
 	session.AddHandler(ready)
 	session.AddHandler(command)
-	session.Identify.Intents |= discordgo.IntentsGuildMembers
-	session.Identify.Intents |= discordgo.IntentsDirectMessageReactions
 	// session.AddHandler(message)
+	session.Identify.Intents = discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildMembers | discordgo.IntentsGuildVoiceStates | discordgo.IntentsDirectMessageReactions
 
 	defer session.Close()
 
@@ -42,7 +41,7 @@ func Start(token string, database *mongo.Database) {
 	log.Printf("Bot is online: %v guilds \n", len(session.State.Guilds))
 
 	db = database
-	
+
 	// Shutdown
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)

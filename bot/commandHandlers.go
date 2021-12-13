@@ -1,16 +1,19 @@
 package bot
 
 import (
+	"archroid/ElProfessorBot/music"
 	"archroid/ElProfessorBot/poll"
 	"archroid/ElProfessorBot/structs"
 	embed "archroid/ElProfessorBot/utils"
 	"archroid/ElProfessorBot/youtubemusic"
 	"context"
 	"fmt"
+	"io"
 
 	"math/rand"
 	"time"
 
+	"github.com/jonas747/dca"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
@@ -433,20 +436,38 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	},
 
 	"play": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
-		musicInput := i.ApplicationCommandData().Options[0].StringValue()
-
-		videoID, err := youtubemusic.GetVideoID(musicInput)
+		videoId, err := music.GetVideoID(i.ApplicationCommandData().Options[0].StringValue())
 		if err != nil {
 			log.Println(err)
 		}
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: fmt.Sprintf("video URL: https://www.youtube.com/watch?v=%v", videoID),
-			},
-		})
-		joinVoice(s, i)
+		videoDlUrl, err := music.GetVideoDownloadUrl(videoId)
+		if err != nil {
+			log.Println(err)
+		}
+		println(videoDlUrl)
+
+		opts := dca.StdEncodeOptions
+		opts.RawOutput = true
+		opts.Bitrate = 64
+		opts.Application = "lowdelay"
+
+		encodeSession, err := dca.EncodeFile(videoDlUrl, opts)
+		if err != nil {
+			log.Println("FATA: Failed creating an encoding session: ", err)
+		}
+		done := make(chan error)
+		dca.NewStream(encodeSession, vc, done)
+		for {
+			select {
+			case err := <-done:
+				if err != nil && err != io.EOF {
+					log.Println("FATA: An error occured", err)
+				}
+				// Clean up incase something happened and ffmpeg is still running
+				encodeSession.Cleanup()
+				return
+			}
+		}
 
 	},
 	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
