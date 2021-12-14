@@ -8,12 +8,10 @@ import (
 	"archroid/ElProfessorBot/youtubemusic"
 	"context"
 	"fmt"
-	"io"
 
 	"math/rand"
 	"time"
 
-	"github.com/jonas747/dca"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
@@ -440,35 +438,11 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 		if err != nil {
 			log.Println(err)
 		}
-		videoDlUrl, err := music.GetVideoDownloadUrl(videoId)
+
+		err = music.GetVideoDownloadUrl(videoId, vc)
 		if err != nil {
 			log.Println(err)
 		}
-		println(videoDlUrl)
-
-		opts := dca.StdEncodeOptions
-		opts.RawOutput = true
-		opts.Bitrate = 64
-		opts.Application = "lowdelay"
-
-		encodeSession, err := dca.EncodeFile(videoDlUrl, opts)
-		if err != nil {
-			log.Println("FATA: Failed creating an encoding session: ", err)
-		}
-		done := make(chan error)
-		dca.NewStream(encodeSession, vc, done)
-		for {
-			select {
-			case err := <-done:
-				if err != nil && err != io.EOF {
-					log.Println("FATA: An error occured", err)
-				}
-				// Clean up incase something happened and ffmpeg is still running
-				encodeSession.Cleanup()
-				return
-			}
-		}
-
 	},
 	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
