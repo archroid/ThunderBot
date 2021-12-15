@@ -5,13 +5,14 @@ import (
 	"archroid/ElProfessorBot/poll"
 	"archroid/ElProfessorBot/structs"
 	embed "archroid/ElProfessorBot/utils"
-	"archroid/ElProfessorBot/youtubemusic"
+	"archroid/ElProfessorBot/voice"
 	"context"
 	"fmt"
 
 	"math/rand"
 	"time"
 
+	"github.com/jonas747/dca"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
@@ -19,6 +20,7 @@ import (
 )
 
 var vc *discordgo.VoiceConnection
+var streamingSession *dca.StreamingSession
 
 var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 	"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -92,6 +94,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 		time.Sleep(time.Second * 2)
 		s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 	},
+
 	"set-welcome": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		if i.ApplicationCommandData().Options[0].BoolValue() {
@@ -199,6 +202,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 		}
 	},
+
 	"auto-role": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if i.ApplicationCommandData().Options[0].BoolValue() {
 			if len(i.ApplicationCommandData().Options) == 2 {
@@ -300,6 +304,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 		}
 	},
+
 	"roll": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		RandomIntegerwithinRange := rand.Intn(int(i.ApplicationCommandData().Options[0].IntValue()))
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -404,20 +409,101 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 				Content: "https://elprofessorbot.archroid.xyz",
 			},
 		})
+	},
 
+	"poll": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		poll.CreatePoll(s, i)
+	},
+
+	"search": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		// send the searching response
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Searching...",
+			},
+		})
+
+		musicInput := i.ApplicationCommandData().Options[0].StringValue()
+
+		videoID, err := music.GetVideoID(musicInput)
+		if err != nil {
+			embed := embed.NewEmbed().
+				SetColor(0xff0000).
+				SetTitle("🔴Error!").
+				SetDescription("Couldn't find video!").
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			// edit the prevoise response to error embed
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: "",
+				Embeds:  embeds,
+			})
+
+			time.Sleep(time.Second * 3)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+		}
+
+		// edit the prevoise response to result
+		s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			Content: fmt.Sprintf("https://www.youtube.com/watch?v=%v", videoID),
+		})
 	},
 
 	"join": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		joinVoice(s, i)
-	},
+		// send the processing response
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Processing...",
+			},
+		})
 
-	"disconnect": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		vc.Disconnect()
+		voiceConnection, err := voice.JoinVoice(s, i)
+		if err != nil {
+			embed := embed.NewEmbed().
+				SetColor(0xff0000).
+				SetTitle("🔴Error!").
+				SetDescription(err.Error()).
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+
+				Content: " ",
+				Embeds:  embeds,
+			})
+			time.Sleep(time.Second * 3)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+		}
 
 		embed := embed.NewEmbed().
 			SetColor(0x00ff00).
-			SetTitle("✅Done!").
-			SetDescription(`Disconnected`).
+			SetTitle("✅Connected!").
+			MessageEmbed
+
+		embeds := []*discordgo.MessageEmbed{embed}
+
+		s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			Content: " ",
+			Embeds:  embeds,
+		})
+		time.Sleep(time.Second * 2)
+		s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+
+		vc = voiceConnection
+	},
+
+	"disconnect": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+		voice.DisconnectVoice(vc)
+
+		embed := embed.NewEmbed().
+			SetColor(0x00ff00).
+			SetTitle("✅Disconnected!").
 			MessageEmbed
 
 		embeds := []*discordgo.MessageEmbed{embed}
@@ -434,96 +520,84 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	},
 
 	"play": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		// send the processing response
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Processing...",
+			},
+		})
+
+		guild, _ := s.State.Guild(i.GuildID)
+
+		if vc == nil || vc.ChannelID != voice.GetCurrentVoiceChannel(i.Member.User, s, guild).ID {
+			voiceConnection, err := voice.JoinVoice(s, i)
+			if err != nil {
+				embed := embed.NewEmbed().
+					SetColor(0xff0000).
+					SetTitle("🔴Error!").
+					SetDescription(err.Error()).
+					MessageEmbed
+
+				embeds := []*discordgo.MessageEmbed{embed}
+
+				s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+					Content: " ",
+					Embeds:  embeds,
+				})
+				time.Sleep(time.Second * 3)
+				s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+			}
+
+			vc = voiceConnection
+		}
+
 		videoId, err := music.GetVideoID(i.ApplicationCommandData().Options[0].StringValue())
 		if err != nil {
-			log.Println(err)
-		}
-
-		err = music.GetVideoDownloadUrl(videoId, vc)
-		if err != nil {
-			log.Println(err)
-		}
-	},
-	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
-	},
-	"search": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		musicInput := i.ApplicationCommandData().Options[0].StringValue()
-
-		videoID, err := youtubemusic.GetVideoID(musicInput)
-		if err != nil {
-			log.Println(err)
-		}
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: fmt.Sprintf("https://www.youtube.com/watch?v=%v", videoID),
-			},
-		})
-	},
-	"poll": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		poll.CreatePoll(s, i)
-	},
-}
-
-func joinVoice(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	guild, _ := s.State.Guild(i.GuildID)
-	var channel *discordgo.Channel
-
-	if getCurrentVoiceChannel(i.Member.User, s, guild) == nil {
-		log.Println("You are not connected to a voice channel.")
-		embed := embed.NewEmbed().
-			SetColor(0xff0000).
-			SetTitle("🔴Error!").
-			SetDescription(`You are not connected to a voice channel.`).
-			MessageEmbed
-
-		embeds := []*discordgo.MessageEmbed{embed}
-
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "",
-				Embeds:  embeds,
-			},
-		})
-		time.Sleep(time.Second * 3)
-		s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
-	} else {
-		channel = getCurrentVoiceChannel(i.Member.User, s, guild)
-		VoiceConnection, err := s.ChannelVoiceJoin(i.GuildID, channel.ID, false, true)
-		if err != nil {
-			log.Println(err)
 			embed := embed.NewEmbed().
 				SetColor(0xff0000).
 				SetTitle("🔴Error!").
-				SetDescription(`Error joining the voice`).
+				SetDescription("Couldn't find video!").
 				MessageEmbed
 
 			embeds := []*discordgo.MessageEmbed{embed}
 
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "",
-					Embeds:  embeds,
-				},
+			s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+				Content: " ",
+				Embeds:  embeds,
 			})
+
 			time.Sleep(time.Second * 3)
 			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
-
-		} else {
-			vc = VoiceConnection
 		}
-	}
-}
 
-func getCurrentVoiceChannel(user *discordgo.User, session *discordgo.Session, guild *discordgo.Guild) *discordgo.Channel {
-	for _, vs := range guild.VoiceStates {
-		if vs.UserID == user.ID {
-			channel, _ := session.Channel(vs.ChannelID)
-			return channel
+		time.Sleep(time.Second * 2)
+		s.InteractionResponseEdit(s.State.User.ID, i.Interaction, &discordgo.WebhookEdit{
+			Content: fmt.Sprintf("https://www.youtube.com/watch?v=%v", videoId),
+			Embeds:  nil,
+		})
+		if streamingSession != nil {
+			streamingSession.SetPaused(false)
 		}
-	}
-	return nil
+
+		streamingSession, err = music.Play(videoId, vc)
+		if err != nil {
+			log.Println(err)
+		}
+
+	},
+
+	"stop": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		// send the processing response
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Processing...",
+			},
+		})
+
+		if streamingSession != nil {
+			streamingSession.SetPaused(true)
+		}
+	},
 }
