@@ -500,6 +500,7 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	"disconnect": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 		voice.DisconnectVoice(vc)
+		vc = nil
 
 		embed := embed.NewEmbed().
 			SetColor(0x00ff00).

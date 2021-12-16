@@ -2,6 +2,7 @@ package music
 
 import (
 	"io"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/jonas747/dca"
@@ -29,18 +30,23 @@ func Play(videoId string, voiceConnection *discordgo.VoiceConnection) (streaming
 		return nil, err
 	}
 
+	log.Println(downloadURL)
+
 	encodingSession, err := dca.EncodeFile(downloadURL, options)
 	if err != nil {
 		return nil, err
 	}
 	defer encodingSession.Cleanup()
 
+	voiceConnection.Speaking(true)
 	done := make(chan error)
 	streamingSession = dca.NewStream(encodingSession, voiceConnection, done)
 	err = <-done
 	if err != nil && err != io.EOF {
 		return nil, err
 	}
+
+	voiceConnection.Speaking(false)
 	return streamingSession, nil
 
 }
