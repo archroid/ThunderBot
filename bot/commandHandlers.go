@@ -636,6 +636,10 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			content += fmt.Sprintf("%v\n", note.Name)
 		}
 
+		if len(notes) == 0 {
+			content = "No notes found!"
+		}
+
 		embed := embed.NewEmbed().
 			SetColor(0x00ff00).
 			SetTitle("📝Notes").
@@ -711,7 +715,23 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 
 		err := db.Collection("notes").FindOne(context.TODO(), filter).Decode(&note)
 		if err != nil {
-			log.Println(err)
+			embed := embed.NewEmbed().
+				SetColor(0xff0000).
+				SetTitle("🔴Error!").
+				SetDescription(`This note not found.`).
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+					Embeds:  embeds,
+				},
+			})
+			time.Sleep(time.Second * 2)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 		}
 		embed := embed.NewEmbed().
 			SetColor(0x00ff00).
