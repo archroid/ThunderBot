@@ -597,8 +597,92 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			},
 		})
 
-		if streamingSession != nil {
-			streamingSession.SetPaused(true)
+		vc.Disconnect()
+		vc = nil
+
+	},
+
+	"notes": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		guildId := i.GuildID
+
+		var note structs.Note
+
+		filter := bson.M{"guildid": guildId}
+
+		err := db.Collection("notes").FindOne(context.TODO(), filter).Decode(&note)
+		if err != nil {
+			log.Println(err)
 		}
+
+		content := fmt.Sprintf("")
+
+		for _, name := range note.Name {
+			content += fmt.Sprintf("%v\n", name)
+		}
+
+		embed := embed.NewEmbed().
+			SetColor(0x00ff00).
+			SetTitle("📝Notes").
+			SetDescription(content).
+			MessageEmbed
+
+		embeds := []*discordgo.MessageEmbed{embed}
+
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: " ",
+				Embeds:  embeds,
+			},
+		})
+
+	},
+
+	"add-note": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		guildId := i.GuildID
+		noteName := i.ApplicationCommandData().Options[0].StringValue()
+		noteContent := i.ApplicationCommandData().Options[1].StringValue()
+
+		insertNote := structs.Note{Name: noteName, Content: noteContent, GuildId: guildId}
+
+		_, err := db.Collection("notes").InsertOne(context.TODO(), insertNote)
+		if err != nil {
+			embed := embed.NewEmbed().
+				SetColor(0xff0000).
+				SetTitle("🔴Error!").
+				SetDescription(`Couldn't add note`).
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+					Embeds:  embeds,
+				},
+			})
+			time.Sleep(time.Second * 2)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+		} else {
+			embed := embed.NewEmbed().
+				SetColor(0x00ff00).
+				SetTitle("✅Success!").
+				SetDescription(`Note added`).
+				MessageEmbed
+
+			embeds := []*discordgo.MessageEmbed{embed}
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "",
+					Embeds:  embeds,
+				},
+			})
+			time.Sleep(time.Second * 2)
+			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
+		}
+
 	},
 }

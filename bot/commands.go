@@ -225,6 +225,52 @@ var (
 				},
 			},
 		},
+
+		{
+			Name:        "notes",
+			Description: "Get all notes",
+		},
+		{
+			Name:        "get-note",
+			Description: "Get a note",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "note",
+					Description: "Note name",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "delete-note",
+			Description: "Delete a note",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "note",
+					Description: "Note name",
+					Required:    true,
+				},
+			}},
+		{
+			Name:        "add-note",
+			Description: "Add a note",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "note-name",
+					Description: "Note name",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "note-content",
+					Description: "Note content",
+					Required:    true,
+				},
+			},
+		},
 	}
 )
 

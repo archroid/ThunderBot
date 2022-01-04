@@ -15,3 +15,9 @@ type Rules struct {
 	Rules   string
 	GuildID string
 }
+
+type Note struct {
+	GuildId string
+	Name    string
+	Content string
+}
