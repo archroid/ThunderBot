@@ -17,6 +17,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var vc *discordgo.VoiceConnection
@@ -605,19 +606,34 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 	"notes": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		guildId := i.GuildID
 
-		var note structs.Note
-
 		filter := bson.M{"guildid": guildId}
 
-		err := db.Collection("notes").FindOne(context.TODO(), filter).Decode(&note)
+		findOptions := options.Find()
+		findOptions.SetLimit(0)
+
+		cur, err := db.Collection("notes").Find(context.TODO(), filter, findOptions)
 		if err != nil {
 			log.Println(err)
 		}
 
+		var notes []*structs.Note
+		for cur.Next(context.TODO()) {
+			var elem structs.Note
+			err := cur.Decode(&elem)
+			if err != nil {
+				log.Fatal(err)
+			}
+			notes = append(notes, &elem)
+		}
+		if err := cur.Err(); err != nil {
+			log.Fatal(err)
+		}
+		cur.Close(context.TODO())
+
 		content := fmt.Sprintf("")
 
-		for _, name := range note.Name {
-			content += fmt.Sprintf("%v\n", name)
+		for _, note := range notes {
+			content += fmt.Sprintf("%v\n", note.Name)
 		}
 
 		embed := embed.NewEmbed().
@@ -683,6 +699,35 @@ var commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.Interac
 			time.Sleep(time.Second * 2)
 			s.InteractionResponseDelete(s.State.User.ID, i.Interaction)
 		}
+
+	},
+	"get-note": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		guildId := i.GuildID
+		noteName := i.ApplicationCommandData().Options[0].StringValue()
+
+		var note structs.Note
+
+		filter := bson.M{"guildid": guildId, "name": noteName}
+
+		err := db.Collection("notes").FindOne(context.TODO(), filter).Decode(&note)
+		if err != nil {
+			log.Println(err)
+		}
+		embed := embed.NewEmbed().
+			SetColor(0x00ff00).
+			SetTitle(note.Name).
+			SetDescription(note.Content).
+			MessageEmbed
+
+		embeds := []*discordgo.MessageEmbed{embed}
+
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: " ",
+				Embeds:  embeds,
+			},
+		})
 
 	},
 }
