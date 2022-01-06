@@ -18,9 +18,8 @@ const (
 		discordgo.IntentsGuildMessageReactions |
 		discordgo.IntentsGuildMessages |
 		discordgo.IntentsGuildVoiceStates |
-		discordgo.IntentsGuilds |
-		discordgo.IntentsGuildVoiceStates
-		
+		discordgo.IntentsGuilds
+
 	ColorEmbedError   = 0xd32f2f
 	ColorEmbedDefault = 0xffc107
 	ColorEmbedUpdated = 0x8bc34a

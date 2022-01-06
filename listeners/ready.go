@@ -22,5 +22,5 @@ func NewListenerReady(container di.Container) *ListenerReady {
 }
 
 func (l *ListenerReady) Handler(s *discordgo.Session, e *discordgo.Ready) {
-
+	s.UpdateGameStatus(5, "/help")
 }

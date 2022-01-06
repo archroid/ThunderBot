@@ -16,16 +16,13 @@ func InitDiscordBotSession(container di.Container) {
 
 	session.Token = "Bot " + os.Getenv("DISCORD_BOT_TOKEN")
 
-	session.StateEnabled = true
-	session.Identify.Intents = discordgo.MakeIntent(static.Intents)
-	session.StateEnabled = false
-
 	session.AddHandler(listeners.NewListenerReady(container).Handler)
 	session.AddHandler(listeners.NewListenerMemberAdd(container).Handler)
+
+	session.Identify.Intents = discordgo.MakeIntent(static.Intents)
 
 	err := session.Open()
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed connecting Discord bot session")
 	}
-
 }

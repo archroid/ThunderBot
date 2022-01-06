@@ -27,6 +27,20 @@ func main() {
 		},
 	})
 
+	// Initialize discord bot session and shutdown routine
+	diBuilder.Add(di.Def{
+		Name: static.DiDiscordSession,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return discordgo.New()
+		},
+		Close: func(obj interface{}) error {
+			session := obj.(*discordgo.Session)
+			logrus.Info("Shutting down bot session...")
+			session.Close()
+			return nil
+		},
+	})
+
 	// Initialize database middleware and shutdown routine
 	diBuilder.Add(di.Def{
 		Name: static.DiDatabase,
@@ -50,20 +64,6 @@ func main() {
 		Close: func(obj interface{}) error {
 			logrus.Info("Unegister commands ...")
 			return obj.(*ken.Ken).Unregister()
-		},
-	})
-
-	// Initialize discord bot session and shutdown routine
-	diBuilder.Add(di.Def{
-		Name: static.DiDiscordSession,
-		Build: func(ctn di.Container) (interface{}, error) {
-			return discordgo.New()
-		},
-		Close: func(obj interface{}) error {
-			session := obj.(*discordgo.Session)
-			logrus.Info("Shutting down bot session...")
-			session.Close()
-			return nil
 		},
 	})
 
