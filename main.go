@@ -20,12 +20,7 @@ func main() {
 	// Initialize dependency injection builder
 	diBuilder, _ := di.NewBuilder()
 
-	diBuilder.Add(di.Def{
-		Name: static.DiState,
-		Build: func(ctn di.Container) (interface{}, error) {
-			return inits.InitState(ctn)
-		},
-	})
+
 
 	// Initialize discord bot session and shutdown routine
 	diBuilder.Add(di.Def{

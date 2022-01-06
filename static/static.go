@@ -5,7 +5,7 @@ import "github.com/bwmarrin/discordgo"
 const (
 	DiDatabase       = "database"
 	DiDiscordSession = "discordgosession"
-	DiConfig         = "config"
+	// DiConfig         = "config"
 	DiState          = "dgstate"
 	DiCommandHandler = "kencommandhandler"
 
