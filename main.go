@@ -20,8 +20,6 @@ func main() {
 	// Initialize dependency injection builder
 	diBuilder, _ := di.NewBuilder()
 
-
-
 	// Initialize discord bot session and shutdown routine
 	diBuilder.Add(di.Def{
 		Name: static.DiDiscordSession,
@@ -80,9 +78,9 @@ func main() {
 	// Block main go routine until one of the following
 	// specified exit syscalls occure.
 	logrus.Info("Bot started. Stop with CTRL-C...")
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+	<-stop
 
 	// Tear down dependency instances
 	ctn.DeleteWithSubContainers()
