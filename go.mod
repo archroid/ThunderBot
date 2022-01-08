@@ -6,6 +6,7 @@ require (
 	github.com/bwmarrin/discordgo v0.23.3-0.20211228023845-29269347e820
 	github.com/sarulabs/di/v2 v2.4.2
 	github.com/sirupsen/logrus v1.8.1
+	github.com/zekrotja/dgrs v0.3.2
 	github.com/zekrotja/ken v0.11.1
 	go.mongodb.org/mongo-driver v1.8.2
 	google.golang.org/api v0.64.0
@@ -28,7 +29,6 @@ require (
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
-	github.com/zekrotja/dgrs v0.3.2 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/otel v0.20.0 // indirect
 	go.opentelemetry.io/otel/metric v0.20.0 // indirect

@@ -1,7 +1,6 @@
 package inits
 
 import (
-	"archroid/ElProfessorBot/commands/slashcommands"
 	"archroid/ElProfessorBot/static"
 	"fmt"
 
@@ -15,7 +14,6 @@ func InitCommandHandler(container di.Container) (k *ken.Ken, err error) {
 	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
 
 	k, err = ken.New(session, ken.Options{
-
 		DependencyProvider: container,
 		OnSystemError:      systemErrorHandler,
 		OnCommandError:     commandErrorHandler,
@@ -25,15 +23,14 @@ func InitCommandHandler(container di.Container) (k *ken.Ken, err error) {
 		return
 	}
 
-	err = k.RegisterCommands(
-		new(slashcommands.Clear),
-	)
+	err = k.RegisterCommands()
 	if err != nil {
 		return
 	}
 
 	return
 }
+
 func systemErrorHandler(context string, err error, args ...interface{}) {
 	logrus.WithField("ctx", context).WithError(err).Error("ken error")
 }
