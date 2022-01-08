@@ -48,6 +48,14 @@ func main() {
 		},
 	})
 
+	// Initialize youtubesearch service
+	diBuilder.Add(di.Def{
+		Name: static.DiYoutubeSearch,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return inits.InitYoutubeSearch(), nil
+		},
+	})
+
 	// Initialize command handler
 	diBuilder.Add(di.Def{
 		Name: static.DiCommandHandler,
@@ -70,6 +78,7 @@ func main() {
 		FullTimestamp:   true,
 		TimestampFormat: "2006/01/02 15:04:05",
 	})
+
 
 	// Initialize discord session and event
 	// handlers
