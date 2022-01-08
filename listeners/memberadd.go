@@ -2,8 +2,8 @@ package listeners
 
 import (
 	"archroid/ElProfessorBot/models"
+	"archroid/ElProfessorBot/pkg/embedbuilder"
 	"archroid/ElProfessorBot/static"
-	"archroid/ElProfessorBot/utils/embedbuilder"
 	"context"
 	"strings"
 

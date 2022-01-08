@@ -5,7 +5,6 @@ import "github.com/bwmarrin/discordgo"
 const (
 	DiDatabase       = "database"
 	DiDiscordSession = "discordgosession"
-	DiState          = "dgstate"
 	DiCommandHandler = "kencommandhandler"
 	DiYoutubeSearch  = "youtubeseach"
 

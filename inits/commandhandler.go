@@ -1,23 +1,21 @@
 package inits
 
 import (
+	"archroid/ElProfessorBot/commands/slashcommands"
 	"archroid/ElProfessorBot/static"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/sirupsen/logrus"
-	"github.com/zekrotja/dgrs"
 	"github.com/zekrotja/ken"
-	"github.com/zekrotja/ken/state"
 )
 
 func InitCommandHandler(container di.Container) (k *ken.Ken, err error) {
 	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
-	st := container.Get(static.DiState).(*dgrs.State)
 
 	k, err = ken.New(session, ken.Options{
-		State:              state.NewDgrs(st),
+
 		DependencyProvider: container,
 		OnSystemError:      systemErrorHandler,
 		OnCommandError:     commandErrorHandler,
@@ -28,7 +26,7 @@ func InitCommandHandler(container di.Container) (k *ken.Ken, err error) {
 	}
 
 	err = k.RegisterCommands(
-		
+		new(slashcommands.Clear),
 	)
 	if err != nil {
 		return
