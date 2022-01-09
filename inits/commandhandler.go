@@ -1,50 +1,81 @@
 package inits
 
 import (
+	"archroid/ElProfessorBot/commands"
 	"archroid/ElProfessorBot/static"
+	"archroid/ElProfessorBot/utils"
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/sirupsen/logrus"
-	"github.com/zekrotja/ken"
+	"github.com/zekroTJA/shireikan"
 )
 
-func InitCommandHandler(container di.Container) (k *ken.Ken, err error) {
+func InitLegacyCommandHandler(container di.Container) shireikan.Handler {
 	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
 
-	k, err = ken.New(session, ken.Options{
-		DependencyProvider: container,
-		OnSystemError:      systemErrorHandler,
-		OnCommandError:     commandErrorHandler,
+	cmdHandler := shireikan.New(&shireikan.Config{
+		GeneralPrefix:         "!",
+		AllowBots:             false,
+		AllowDM:               true,
+		DeleteMessageAfter:    true,
+		ExecuteOnEdit:         true,
+		InvokeToLower:         true,
+		UseDefaultHelpCommand: true,
+
+		ObjectContainer: container,
+		OnError:         legacyErrorHandler,
 	})
+	cmdHandler.RegisterCommand(&commands.CmdInfo{})
 
-	if err != nil {
-		return
-	}
+	logrus.WithField("n", len(cmdHandler.GetCommandInstances())).Info("Commands registered")
 
-	err = k.RegisterCommands()
-	if err != nil {
-		return
-	}
+	cmdHandler.Setup(session)
 
-	return
+	return cmdHandler
 }
 
-func systemErrorHandler(context string, err error, args ...interface{}) {
-	logrus.WithField("ctx", context).WithError(err).Error("ken error")
-}
+func legacyErrorHandler(ctx shireikan.Context, errTyp shireikan.ErrorType, err error) {
+	switch errTyp {
 
-func commandErrorHandler(err error, ctx *ken.Ctx) {
-	// Is ignored if interaction has already been responded
-	ctx.Defer()
+	// Command execution failed
+	case shireikan.ErrTypCommandExec:
+		msg, _ := ctx.ReplyEmbedError(
+			fmt.Sprintf("Command execution failed unexpectedly: ```\n%s\n```", err.Error()),
+			"Command Execution Failed")
+		utils.DeleteMessageLater(ctx.GetSession(), msg, 60*time.Second)
 
-	if err == ken.ErrNotDMCapable {
-		ctx.FollowUpError("This command can not be used in DMs.", "")
+	// Failed getting channel
+	case shireikan.ErrTypGetChannel:
+		msg, _ := ctx.ReplyEmbedError(
+			fmt.Sprintf("Failed getting channel: ```\n%s\n```", err.Error()),
+			"Unexpected Error")
+		utils.DeleteMessageLater(ctx.GetSession(), msg, 60*time.Second)
+
+	// Failed getting channel
+	case shireikan.ErrTypGetGuild:
+		msg, _ := ctx.ReplyEmbedError(
+			fmt.Sprintf("Failed getting guild: ```\n%s\n```", err.Error()),
+			"Unexpected Error")
+		utils.DeleteMessageLater(ctx.GetSession(), msg, 60*time.Second)
+
+	// Middleware failed
+	case shireikan.ErrTypMiddleware:
+		msg, _ := ctx.ReplyEmbedError(
+			fmt.Sprintf("Command Handler Middleware failed: ```\n%s\n```", err.Error()),
+			"Unexpected Error")
+		utils.DeleteMessageLater(ctx.GetSession(), msg, 60*time.Second)
+
+	// Middleware failed
+	case shireikan.ErrTypNotExecutableInDM:
+		msg, _ := ctx.ReplyEmbedError(
+			"This command is not executable in DM channels.", "")
+		utils.DeleteMessageLater(ctx.GetSession(), msg, 8*time.Second)
+
+	// Ignored Errors
+	case shireikan.ErrTypCommandNotFound, shireikan.ErrTypDeleteCommandMessage:
 		return
 	}
-
-	ctx.FollowUpError(
-		fmt.Sprintf("The command execution failed unexpectedly:\n```\n%s\n```", err.Error()),
-		"Command execution failed")
 }

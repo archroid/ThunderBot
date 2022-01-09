@@ -11,6 +11,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/zekroTJA/shireikan"
 	"github.com/zekrotja/ken"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -56,6 +57,14 @@ func main() {
 		},
 	})
 
+	// Initialize legacy command handler
+	diBuilder.Add(di.Def{
+		Name: static.DiLegacyCommandHandler,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return inits.InitLegacyCommandHandler(ctn), nil
+		},
+	})
+
 	// Initialize command handler
 	diBuilder.Add(di.Def{
 		Name: static.DiCommandHandler,
@@ -79,11 +88,21 @@ func main() {
 		TimestampFormat: "2006/01/02 15:04:05",
 	})
 
-	ctn.Get(static.DiCommandHandler)
+	// ctn.Get(static.DiCommandHandler)
 
 	// Initialize discord session and event
 	// handlers
 	inits.InitDiscordBotSession(ctn)
+
+	// This is currently the really hacky workaround
+	// to bypass the di.Container when trying to get
+	// the Command legacyHandler instance inside a command
+	// context, because the legacyHandler can not resolve
+	// itself on build, so it is bypassed here using
+	// shireikans object map. Maybe I find a better
+	// solution for that at some time.
+	legacyHandler := ctn.Get(static.DiLegacyCommandHandler).(shireikan.Handler)
+	legacyHandler.SetObject(static.DiLegacyCommandHandler, legacyHandler)
 
 	// Block main go routine until one of the following
 	// specified exit syscalls occure.

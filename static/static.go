@@ -3,10 +3,15 @@ package static
 import "github.com/bwmarrin/discordgo"
 
 const (
-	DiDatabase       = "database"
-	DiDiscordSession = "discordgosession"
-	DiCommandHandler = "kencommandhandler"
-	DiYoutubeSearch  = "youtubeseach"
+	DiDatabase             = "database"
+	DiDiscordSession       = "discordgosession"
+	DiCommandHandler       = "kencommandhandler"
+	DiYoutubeSearch        = "youtubeseach"
+	DiLegacyCommandHandler = "skcommandhandler"
+
+	DiscordInviteLink = "https://discord.com/oauth2/authorize?client_id=901356147720749096&permissions=2080374975&scope=bot+applications.commands+identify+guilds"
+
+	// DiCommandPrefix = "commandprefix"
 
 	Intents = discordgo.IntentsDirectMessages |
 		discordgo.IntentsGuildBans |
