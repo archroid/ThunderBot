@@ -24,12 +24,14 @@ func InitLegacyCommandHandler(container di.Container) shireikan.Handler {
 		ExecuteOnEdit:         true,
 		InvokeToLower:         true,
 		UseDefaultHelpCommand: true,
-		ObjectContainer:       container,
-		OnError:               legacyErrorHandler,
+		
+		ObjectContainer: container,
+		OnError:         legacyErrorHandler,
 	})
 	cmdHandler.RegisterCommand(&commands.CmdPing{})
 	cmdHandler.RegisterCommand(&commands.CmdInfo{})
 	cmdHandler.RegisterCommand(&commands.CmdClear{})
+	cmdHandler.RegisterCommand(&commands.CmdPlay{})
 
 	logrus.WithField("n", len(cmdHandler.GetCommandInstances())).Info("Commands registered")
 

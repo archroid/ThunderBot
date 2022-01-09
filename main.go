@@ -23,6 +23,14 @@ func main() {
 
 	// Initialize discord bot session and shutdown routine
 	diBuilder.Add(di.Def{
+		Name: static.DiContainer,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return ctn, nil
+		},
+	})
+
+	// Initialize discord bot session and shutdown routine
+	diBuilder.Add(di.Def{
 		Name: static.DiDiscordSession,
 		Build: func(ctn di.Container) (interface{}, error) {
 			return discordgo.New()
