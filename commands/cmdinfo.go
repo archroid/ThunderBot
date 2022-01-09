@@ -3,6 +3,7 @@ package commands
 import (
 	"archroid/ElProfessorBot/static"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -50,28 +51,48 @@ func (c *CmdInfo) Exec(ctx shireikan.Context) error {
 
 	emb := &discordgo.MessageEmbed{
 		Color: static.ColorEmbedDefault,
-		Title: "Info",
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: session.State.User.AvatarURL(""),
+		},
+		Author: &discordgo.MessageEmbedAuthor{
+			Name:    session.State.User.Username,
+			IconURL: session.State.User.AvatarURL(""),
 		},
 		Description: infoMsg,
 		Fields: []*discordgo.MessageEmbedField{
 			{
-				Name:  "Repository",
-				Value: "[github.com/archroid/ElProfessorBot](https://github.com/archroid/ElProfessorBot)",
+				Name:   "🏅 Version",
+				Value:  "0.0.1 Alpha",
+				Inline: true,
 			},
 			{
-				Name:  "Licence",
+				Name:   "📢 Servers",
+				Value:  strconv.Itoa(len(session.State.Guilds)),
+				Inline: true,
+			},
+
+			{
+				Name:   "💻 Created by",
+				Value:  "@Jinx#0477",
+				Inline: true,
+			},
+			{
+				Name:  "🚥 Licence",
 				Value: "Covered by the [GNU General Public License](https://github.com/archroid/ElProfessorBot/blob/main/LICENSE).",
 			},
 			{
-				Name: "Invite",
-				Value: fmt.Sprintf("[Invite Link](%s).\n```\n%s\n```",
-					invLink, invLink),
+				Name:  "📑 Repository",
+				Value: "[github.com/archroid/ElProfessorBot](https://github.com/archroid/ElProfessorBot)",
+			},
+
+			{
+				Name:  "🌀 Website",
+				Value: "[elprofessorbot.archroid.xyz](https://elprofessorbot.archroid.xyz)",
 			},
 			{
-				Name:  "Development state",
-				Value: "Testing.",
+				Name: "📡 Invite",
+				Value: fmt.Sprintf("[Invite Link](%s)",
+					invLink),
 			},
 		},
 		Footer: &discordgo.MessageEmbedFooter{

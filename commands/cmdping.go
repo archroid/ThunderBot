@@ -44,9 +44,9 @@ func (c *CmdPing) Exec(ctx shireikan.Context) error {
 	ping := s.HeartbeatLatency().Truncate(60).Round(time.Millisecond)
 
 	emb := &discordgo.MessageEmbed{
-		Color:       static.ColorEmbedDefault,
-		Title:       "pong!🏓",
-		Description: `⌛** Time: **` + ping.String(),
+		Color:       static.ColorEmbedGreen,
+		Title:       "💓 Pong",
+		Description: `📡** Letancy: **` + ping.String(),
 	}
 	_, err := ctx.GetSession().ChannelMessageSendEmbed(ctx.GetChannel().ID, emb)
 	return err
