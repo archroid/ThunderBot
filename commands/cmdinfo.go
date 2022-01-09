@@ -31,7 +31,7 @@ func (c *CmdInfo) GetGroup() string {
 }
 
 func (c *CmdInfo) GetDomainName() string {
-	return "archroid.xyz"
+	return ""
 }
 
 func (c *CmdInfo) GetSubPermissionRules() []shireikan.SubPermission {
@@ -58,7 +58,7 @@ func (c *CmdInfo) Exec(ctx shireikan.Context) error {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:  "Repository",
-				Value: "[github.com/zekrotja/shinpuru](https://github.com/zekrotja/shinpuru)",
+				Value: "[github.com/archroid/ElProfessorBot](https://github.com/archroid/ElProfessorBot)",
 			},
 			{
 				Name:  "Licence",

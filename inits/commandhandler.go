@@ -17,18 +17,19 @@ func InitLegacyCommandHandler(container di.Container) shireikan.Handler {
 	session := container.Get(static.DiDiscordSession).(*discordgo.Session)
 
 	cmdHandler := shireikan.New(&shireikan.Config{
-		GeneralPrefix:         "!",
+		GeneralPrefix:         "-",
 		AllowBots:             false,
-		AllowDM:               true,
+		AllowDM:               false,
 		DeleteMessageAfter:    true,
 		ExecuteOnEdit:         true,
 		InvokeToLower:         true,
 		UseDefaultHelpCommand: true,
-
-		ObjectContainer: container,
-		OnError:         legacyErrorHandler,
+		ObjectContainer:       container,
+		OnError:               legacyErrorHandler,
 	})
+	cmdHandler.RegisterCommand(&commands.CmdPing{})
 	cmdHandler.RegisterCommand(&commands.CmdInfo{})
+	cmdHandler.RegisterCommand(&commands.CmdClear{})
 
 	logrus.WithField("n", len(cmdHandler.GetCommandInstances())).Info("Commands registered")
 

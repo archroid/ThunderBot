@@ -25,7 +25,7 @@ const (
 		discordgo.IntentsGuilds
 
 	ColorEmbedError   = 0xd32f2f
-	ColorEmbedDefault = 0xffc107
+	ColorEmbedDefault = 0x372168
 	ColorEmbedUpdated = 0x8bc34a
 	ColorEmbedGray    = 0xb0bec5
 	ColorEmbedOrange  = 0xfb8c00

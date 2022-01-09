@@ -19,5 +19,15 @@ func NewListenerReady(container di.Container) *ListenerReady {
 }
 
 func (l *ListenerReady) Handler(s *discordgo.Session, e *discordgo.Ready) {
-	s.UpdateGameStatus(5, "/help")
+
+	usd := discordgo.UpdateStatusData{
+		Activities: []*discordgo.Activity{
+			{
+				Name: "-help",
+				Type: 3,
+			},
+		},
+	}
+
+	s.UpdateStatusComplex(usd)
 }

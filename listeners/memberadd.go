@@ -5,7 +5,7 @@ import (
 	"archroid/ElProfessorBot/pkg/embedbuilder"
 	"archroid/ElProfessorBot/static"
 	"context"
-	"strings"
+	"fmt"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
@@ -32,18 +32,14 @@ func (l *ListenerMemberAdd) Handler(s *discordgo.Session, e *discordgo.GuildMemb
 	if err != nil {
 		logrus.WithError(err).WithField("gid", e.GuildID).Error("Failed updating welcome message settings")
 	}
-	txt := ""
-	if strings.Contains(welcomeMessage.WelcomeMessage, "[ment]") {
-		txt = e.User.Mention()
-	}
-	msg := strings.Replace(welcomeMessage.WelcomeMessage, "[user]", e.User.Username, -1)
-	msg = strings.Replace(msg, "[ment]", e.User.Mention(), -1)
 
 	s.ChannelMessageSendComplex(welcomeMessage.WelcomeChannelId, &discordgo.MessageSend{
-		Content: txt,
+		Content: "",
 		Embed: embedbuilder.New().
+			WithTitle("👋Welcome!").
+			WithAuthor(e.User.Username, e.User.AvatarURL("24"), e.User.AvatarURL("24"), "").
 			WithColor(static.ColorEmbedDefault).
-			WithDescription(msg).
+			WithDescription(fmt.Sprintf("Welcome to %v , %v \n %v", "this server", e.User.Username, welcomeMessage.WelcomeMessage)).
 			Build(),
 	})
 
