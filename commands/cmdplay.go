@@ -1,7 +1,12 @@
 package commands
 
 import (
+	"archroid/ElProfessorBot/pkg/voice"
+	"archroid/ElProfessorBot/playservice"
 	"archroid/ElProfessorBot/searchservice"
+	"archroid/ElProfessorBot/utils"
+	"time"
+	
 
 	"github.com/sarulabs/di/v2"
 	"github.com/zekroTJA/shireikan"
@@ -52,6 +57,16 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 	}
 
 	ctx.GetSession().ChannelMessageSend(ctx.GetChannel().ID, "https://www.youtube.com/watch?v="+videoId)
+
+	voiceConnection, err := voice.JoinVoice(ctx.GetSession(), ctx.GetGuild(), ctx.GetUser())
+	if err != nil {
+		utils.SendEmbedError(ctx.GetSession(), ctx.GetChannel().ID,
+			"Are you connected to any voice channel? 👀").
+			DeleteAfter(8 * time.Second).Error()
+	}
+
+	playservice.PlayYoutube(videoId, voiceConnection)
+
 	return nil
 
 }
