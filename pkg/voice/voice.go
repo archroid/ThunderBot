@@ -6,15 +6,15 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func JoinVoice(s *discordgo.Session, i *discordgo.InteractionCreate) (vc *discordgo.VoiceConnection, err error) {
-	guild, _ := s.State.Guild(i.GuildID)
+func JoinVoice(s *discordgo.Session, guild *discordgo.Guild, user *discordgo.User) (vc *discordgo.VoiceConnection, err error) {
+
 	var channel *discordgo.Channel
 
-	if GetCurrentVoiceChannel(i.Member.User, s, guild) == nil {
-		return nil, fmt.Errorf("You are not connected to a voice channel.")
+	if GetCurrentVoiceChannel(user, s, guild) == nil {
+		return nil, fmt.Errorf("you are not connected to a voice channel")
 	} else {
-		channel = GetCurrentVoiceChannel(i.Member.User, s, guild)
-		VoiceConnection, err := s.ChannelVoiceJoin(i.GuildID, channel.ID, false, true)
+		channel = GetCurrentVoiceChannel(user, s, guild)
+		VoiceConnection, err := s.ChannelVoiceJoin(guild.ID, channel.ID, false, true)
 		if err != nil {
 			return nil, err
 		}
@@ -25,6 +25,7 @@ func JoinVoice(s *discordgo.Session, i *discordgo.InteractionCreate) (vc *discor
 func DisconnectVoice(vc *discordgo.VoiceConnection) (err error) {
 	err = vc.Disconnect()
 	if err != nil {
+
 		return err
 	}
 	return nil
@@ -39,3 +40,4 @@ func GetCurrentVoiceChannel(user *discordgo.User, session *discordgo.Session, gu
 	}
 	return nil
 }
+
