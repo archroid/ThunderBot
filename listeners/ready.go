@@ -24,7 +24,7 @@ func (l *ListenerReady) Handler(s *discordgo.Session, e *discordgo.Ready) {
 		Activities: []*discordgo.Activity{
 			{
 				Name: "-help",
-				Type: 3,
+				Type: 2,
 			},
 		},
 	}

@@ -55,7 +55,7 @@ func PlayYoutube(videoId string, voiceConnection *discordgo.VoiceConnection) (er
 			stats := encodingSession.Stats()
 			playbackPosition := stream.PlaybackPosition()
 
-			fmt.Printf("\nPlayback: %10s, Transcode Stats: Time: %5s, Size: %5dkB, Bitrate: %6.2fkB, Speed: %5.1fx\r", playbackPosition, stats.Duration.String(), stats.Size, stats.Bitrate, stats.Speed)
+			fmt.Printf("Playback: %10s, Transcode Stats: Time: %5s, Size: %5dkB, Bitrate: %6.2fkB, Speed: %5.1fx\r", playbackPosition, stats.Duration.String(), stats.Size, stats.Bitrate, stats.Speed)
 		}
 	}
 }
