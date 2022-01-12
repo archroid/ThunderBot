@@ -6,9 +6,9 @@ import (
 	"archroid/ElProfessorBot/searchservice"
 	"archroid/ElProfessorBot/utils"
 	"time"
-	
 
 	"github.com/sarulabs/di/v2"
+	"github.com/sirupsen/logrus"
 	"github.com/zekroTJA/shireikan"
 )
 
@@ -65,7 +65,10 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 			DeleteAfter(8 * time.Second).Error()
 	}
 
-	playservice.PlayYoutube(videoId, voiceConnection)
+	err = playservice.PlayYoutube(videoId, voiceConnection)
+	if err != nil {
+		logrus.Info(err)
+	}
 
 	return nil
 
