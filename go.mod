@@ -3,8 +3,10 @@ module archroid/ElProfessorBot
 go 1.17
 
 require (
+	github.com/DisgoOrg/disgolink v1.0.0
+	github.com/DisgoOrg/disgolink/dgolink v0.0.0-20220116021444-03f9eedc9717
+	github.com/DisgoOrg/log v1.1.2
 	github.com/bwmarrin/discordgo v0.23.3-0.20211228023845-29269347e820
-	github.com/jonas747/dca v0.0.0-20210930103944-155f5e5f0cc7
 	github.com/sarulabs/di/v2 v2.4.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/zekroTJA/shireikan v0.7.0
@@ -16,13 +18,10 @@ require (
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
-	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
-	github.com/dop251/goja v0.0.0-20211211112501-fb27c91c26ed // indirect
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.0 // indirect
-	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -46,9 +45,6 @@ require (
 	google.golang.org/genproto v0.0.0-20211223182754-3ac035c7e7cb // indirect
 	google.golang.org/grpc v1.42.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
-)
-
-require (
-	github.com/jonas747/ogg v0.0.0-20161220051205-b4f6f4cf3757 // indirect
-	github.com/kkdai/youtube/v2 v2.7.6
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

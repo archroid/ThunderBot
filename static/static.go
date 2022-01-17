@@ -1,6 +1,10 @@
 package static
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"regexp"
+
+	"github.com/bwmarrin/discordgo"
+)
 
 const (
 	DiContainer            = "container"
@@ -9,6 +13,7 @@ const (
 	DiCommandHandler       = "kencommandhandler"
 	DiYoutubeSearch        = "youtubeseach"
 	DiLegacyCommandHandler = "skcommandhandler"
+	DiDgoLink              = "dgolink"
 
 	DiscordInviteLink = "https://discord.com/oauth2/authorize?client_id=901356147720749096&permissions=2080374975&scope=bot+applications.commands+identify+guilds"
 
@@ -34,4 +39,8 @@ const (
 	ColorEmbedCyan    = 0x00BCD4
 	ColorEmbedYellow  = 0xFFC107
 	ColorEmbedViolett = 0x6A1B9A
+)
+
+var (
+	UrlPattern = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
 )

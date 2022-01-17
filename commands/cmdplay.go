@@ -1,14 +1,13 @@
 package commands
 
 import (
-	"archroid/ElProfessorBot/pkg/voice"
-	"archroid/ElProfessorBot/playservice"
-	"archroid/ElProfessorBot/searchservice"
-	"archroid/ElProfessorBot/utils"
-	"time"
+	"archroid/ElProfessorBot/play"
+	"archroid/ElProfessorBot/static"
 
-	"github.com/sarulabs/di/v2"
-	"github.com/sirupsen/logrus"
+	"github.com/DisgoOrg/disgolink/dgolink"
+
+	"github.com/DisgoOrg/disgolink/lavalink"
+	"github.com/DisgoOrg/log"
 	"github.com/zekroTJA/shireikan"
 )
 
@@ -50,25 +49,37 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 	}
 
 	query := ctx.GetArgs()[0]
-
-	videoId, err := searchservice.GetVideoID(query, ctx.GetObject("container").(di.Container))
-	if err != nil {
-		return err
+	if !static.UrlPattern.MatchString(query) {
+		query = "ytsearch:" + query
 	}
 
-	ctx.GetSession().ChannelMessageSend(ctx.GetChannel().ID, "https://www.youtube.com/watch?v="+videoId)
+	session := ctx.GetSession()
 
-	voiceConnection, err := voice.JoinVoice(ctx.GetSession(), ctx.GetGuild(), ctx.GetUser())
-	if err != nil {
-		utils.SendEmbedError(ctx.GetSession(), ctx.GetChannel().ID,
-			"Are you connected to any voice channel? 👀").
-			DeleteAfter(8 * time.Second).Error()
-	}
+	link := ctx.GetObject(static.DiDgoLink).(*dgolink.Link)
 
-	err = playservice.PlayYoutube(videoId, voiceConnection)
-	if err != nil {
-		logrus.Info(err)
-	}
+	link.BestRestClient().LoadItemHandler(query, lavalink.NewResultHandler(
+		func(track lavalink.Track) {
+			play.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, track)
+		},
+		func(playlist lavalink.Playlist) {
+			play.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, playlist.Tracks[0])
+		},
+		func(tracks []lavalink.Track) {
+			play.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, tracks[0])
+		},
+		func() {
+			_, err := session.ChannelMessageSend(ctx.GetChannel().ID, "No matches found for: "+query)
+			if err != nil {
+				log.Info(err)
+			}
+		},
+		func(ex lavalink.Exception) {
+			_, err := session.ChannelMessageSend(ctx.GetChannel().ID, "Error while loading track: "+ex.Message)
+			if err != nil {
+				log.Info(err)
+			}
+		},
+	))
 
 	return nil
 

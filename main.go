@@ -8,6 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/DisgoOrg/disgolink/dgolink"
+
+	"github.com/DisgoOrg/disgolink/lavalink"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/sirupsen/logrus"
@@ -43,6 +46,24 @@ func main() {
 		},
 	})
 
+	// Initialize dgolink
+	diBuilder.Add(di.Def{
+		Name: static.DiDgoLink,
+		Build: func(ctn di.Container) (interface{}, error) {
+
+			link := dgolink.New(ctn.Get(static.DiDiscordSession).(*discordgo.Session))
+
+			link.AddNode(lavalink.NodeConfig{
+				Name:     "test",
+				Host:     "localhost",
+				Port:     "2333",
+				Password: "1274",
+			})
+
+			return link, nil
+		},
+	})
+
 	// Initialize database middleware and shutdown routine
 	diBuilder.Add(di.Def{
 		Name: static.DiDatabase,
@@ -54,14 +75,6 @@ func main() {
 			logrus.Info("Shutting down database connection...")
 			database.Client().Disconnect(context.TODO())
 			return nil
-		},
-	})
-
-	// Initialize youtubesearch service
-	diBuilder.Add(di.Def{
-		Name: static.DiYoutubeSearch,
-		Build: func(ctn di.Container) (interface{}, error) {
-			return inits.InitYoutubeSearch(), nil
 		},
 	})
 
