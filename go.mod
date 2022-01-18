@@ -7,7 +7,6 @@ require (
 	github.com/DisgoOrg/disgolink/dgolink v0.0.0-20220116021444-03f9eedc9717
 	github.com/DisgoOrg/log v1.1.2
 	github.com/bwmarrin/discordgo v0.23.3-0.20211228023845-29269347e820
-	github.com/joho/godotenv v1.3.0
 	github.com/sarulabs/di/v2 v2.4.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/zekroTJA/shireikan v0.7.0

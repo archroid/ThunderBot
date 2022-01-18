@@ -17,14 +17,13 @@ import (
 	"github.com/zekroTJA/shireikan"
 	"github.com/zekrotja/ken"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 )
 
 func main() {
 
-	// Load the .env file in the current directory
-	godotenv.Load()
+	// // Load the .env file in the current directory
+	// godotenv.Load()
 
 	// Initialize dependency injection builder
 	diBuilder, _ := di.NewBuilder()
