@@ -9,8 +9,6 @@ import (
 	"syscall"
 
 	"github.com/DisgoOrg/disgolink/dgolink"
-
-	"github.com/DisgoOrg/disgolink/lavalink"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sarulabs/di/v2"
 	"github.com/sirupsen/logrus"
@@ -27,6 +25,24 @@ func main() {
 
 	// Initialize dependency injection builder
 	diBuilder, _ := di.NewBuilder()
+
+	// Initialize dgolink
+	// diBuilder.Add(di.Def{
+	// 	Name: static.DiDgoLink,
+	// 	Build: func(ctn di.Container) (interface{}, error) {
+
+	// 		link := dgolink.New(ctn.Get(static.DiDiscordSession).(*discordgo.Session))
+
+	// 		link.AddNode(lavalink.NodeConfig{
+	// 			Name:     "test",
+	// 			Host:     "localhost",
+	// 			Port:     "2333",
+	// 			Password: "1274",
+	// 		})
+
+	// 		return link, nil
+	// 	},
+	// })
 
 	// Initialize discord bot session and shutdown routine
 	diBuilder.Add(di.Def{
@@ -47,24 +63,6 @@ func main() {
 			logrus.Info("Shutting down bot session...")
 			session.Close()
 			return nil
-		},
-	})
-
-	// Initialize dgolink
-	diBuilder.Add(di.Def{
-		Name: static.DiDgoLink,
-		Build: func(ctn di.Container) (interface{}, error) {
-
-			link := dgolink.New(ctn.Get(static.DiDiscordSession).(*discordgo.Session))
-
-			link.AddNode(lavalink.NodeConfig{
-				Name:     "test",
-				Host:     "localhost",
-				Port:     "2333",
-				Password: "1274",
-			})
-
-			return link, nil
 		},
 	})
 
@@ -102,6 +100,13 @@ func main() {
 		},
 	})
 
+	diBuilder.Add(di.Def{
+		Name: static.DiDgoLink,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return inits.InitDiscordBotSession(ctn), nil
+		},
+	})
+
 	// Build dependency injection container
 	ctn := diBuilder.Build()
 
@@ -117,7 +122,6 @@ func main() {
 
 	// Initialize discord session and event
 	// handlers
-	inits.InitDiscordBotSession(ctn)
 
 	// This is currently the really hacky workaround
 	// to bypass the di.Container when trying to get
@@ -128,6 +132,9 @@ func main() {
 	// solution for that at some time.
 	legacyHandler := ctn.Get(static.DiLegacyCommandHandler).(shireikan.Handler)
 	legacyHandler.SetObject(static.DiLegacyCommandHandler, legacyHandler)
+
+	dgolink := ctn.Get(static.DiDgoLink).(*dgolink.Link)
+	legacyHandler.SetObject(static.DiDgoLink, dgolink)
 
 	// Block main go routine until one of the following
 	// specified exit syscalls occure.

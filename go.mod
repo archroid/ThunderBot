@@ -5,7 +5,6 @@ go 1.17
 require (
 	github.com/DisgoOrg/disgolink v1.0.0
 	github.com/DisgoOrg/disgolink/dgolink v0.0.0-20220116021444-03f9eedc9717
-	github.com/DisgoOrg/log v1.1.2
 	github.com/bwmarrin/discordgo v0.23.3-0.20211228023845-29269347e820
 	github.com/sarulabs/di/v2 v2.4.2
 	github.com/sirupsen/logrus v1.8.1
@@ -16,6 +15,7 @@ require (
 )
 
 require (
+	github.com/DisgoOrg/log v1.1.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
