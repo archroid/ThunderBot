@@ -73,7 +73,7 @@ func (c *CmdInfo) Exec(ctx shireikan.Context) error {
 
 			{
 				Name:   "💻 Created by",
-				Value:  "@Jinx#0477",
+				Value:  "@Thuйdёr#0477",
 				Inline: true,
 			},
 			{

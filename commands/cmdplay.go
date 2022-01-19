@@ -2,9 +2,9 @@ package commands
 
 import (
 	"archroid/ElProfessorBot/static"
+	"strings"
 
 	"github.com/DisgoOrg/disgolink/dgolink"
-	"github.com/bwmarrin/discordgo"
 	"github.com/sirupsen/logrus"
 
 	"github.com/DisgoOrg/disgolink/lavalink"
@@ -48,12 +48,11 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 		return nil
 	}
 
-	query := ctx.GetArgs()[0]
+	query := strings.Join(ctx.GetArgs()[:], " ")
+
 	if !static.UrlPattern.MatchString(query) {
 		query = "ytsearch:" + query
 	}
-
-	logrus.Info(query)
 
 	session := ctx.GetSession()
 
@@ -61,13 +60,13 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 
 	link.BestRestClient().LoadItemHandler(query, lavalink.NewResultHandler(
 		func(track lavalink.Track) {
-			play(session, link, ctx.GetGuild(), ctx.GetUser().ID, track)
+			// music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, track)
 		},
 		func(playlist lavalink.Playlist) {
-			play(session, link, ctx.GetGuild(), ctx.GetUser().ID, playlist.Tracks[0])
+			// music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, playlist.Tracks[0])
 		},
 		func(tracks []lavalink.Track) {
-			play(session, link, ctx.GetGuild(), ctx.GetUser().ID, tracks[0])
+			// music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, tracks[0])
 		},
 		func() {
 			_, err := session.ChannelMessageSend(ctx.GetChannel().ID, "No matches found for: "+query)
@@ -85,29 +84,4 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 
 	return nil
 
-}
-
-func play(s *discordgo.Session, link *dgolink.Link, guild *discordgo.Guild, userId string, track lavalink.Track) {
-
-	channelID := getCurrentVoiceChannel(userId, s, guild).ID
-
-	if err := s.ChannelVoiceJoinManual(guild.ID, channelID, false, false); err != nil {
-		_, _ = s.ChannelMessageSend(channelID, "error while joining voice channel: "+err.Error())
-		return
-	}
-	if err := link.Player(guild.ID).Play(track); err != nil {
-		_, _ = s.ChannelMessageSend(channelID, "error while playing track: "+err.Error())
-		return
-	}
-	_, _ = s.ChannelMessageSend(channelID, "Playing: "+track.Info().Title())
-}
-
-func getCurrentVoiceChannel(userId string, session *discordgo.Session, guild *discordgo.Guild) *discordgo.Channel {
-	for _, vs := range guild.VoiceStates {
-		if vs.UserID == userId {
-			channel, _ := session.Channel(vs.ChannelID)
-			return channel
-		}
-	}
-	return nil
 }
