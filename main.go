@@ -2,6 +2,7 @@ package main
 
 import (
 	"archroid/ElProfessorBot/inits"
+	"archroid/ElProfessorBot/music"
 	"archroid/ElProfessorBot/static"
 	"context"
 	"os"
@@ -63,6 +64,14 @@ func main() {
 			logrus.Info("Shutting down bot session...")
 			session.Close()
 			return nil
+		},
+	})
+
+	// Initialize playlist manager service
+	diBuilder.Add(di.Def{
+		Name: static.DiPlaylistManager,
+		Build: func(ctn di.Container) (interface{}, error) {
+			return music.New(), nil
 		},
 	})
 

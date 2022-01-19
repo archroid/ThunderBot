@@ -1,18 +1,8 @@
 package music
 
-import "github.com/DisgoOrg/disgolink/lavalink"
-
-// func (q *Queue) Add(track lavalink.Track) (queue Queue, err error) {
-
-// 	tracks := append(q.Tracks, track)
-
-// 	return Queue{tracks, q.GuildId}, nil
-// }
-
-// func (q *Queue) RemoveFirst() (queue Queue, err error) {
-
-// 	return
-// }
+import (
+	"github.com/DisgoOrg/disgolink/lavalink"
+)
 
 func New() PlaylistManager {
 	playlistManager := &playlistManagertmpl{
@@ -29,6 +19,9 @@ type Playlist struct {
 type PlaylistManager interface {
 	Playlist(guildID string) Playlist
 	Playlists() map[string]Playlist
+
+	AddToPlaylist(track lavalink.Track, guildID string) Playlist
+	GetPlaylist(guildID string) Playlist
 }
 
 type playlistManagertmpl struct {
@@ -47,5 +40,23 @@ func (p *playlistManagertmpl) Playlist(guildID string) Playlist {
 	}
 	playlist := Playlist{GuildID: guildID}
 	p.playlists[guildID] = playlist
+	return playlist
+}
+
+func (p *playlistManagertmpl) AddToPlaylist(track lavalink.Track, guildID string) Playlist {
+
+	playlist := p.Playlist(guildID)
+
+	playlist = Playlist{playlist.GuildID, append(playlist.Tracks, track)}
+
+	p.playlists[playlist.GuildID] = playlist
+
+	return playlist
+}
+
+func (p *playlistManagertmpl) GetPlaylist(guildID string) Playlist {
+
+	playlist := p.Playlist(guildID)
+
 	return playlist
 }

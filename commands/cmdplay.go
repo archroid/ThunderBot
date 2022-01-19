@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"archroid/ElProfessorBot/music"
 	"archroid/ElProfessorBot/static"
 	"strings"
 
@@ -55,6 +56,7 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 	}
 
 	session := ctx.GetSession()
+	plManager := ctx.GetObject(static.DiPlaylistManager).(music.PlaylistManager)
 
 	link := ctx.GetObject(static.DiDgoLink).(*dgolink.Link)
 
@@ -66,7 +68,14 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 			// music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, playlist.Tracks[0])
 		},
 		func(tracks []lavalink.Track) {
-			// music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, tracks[0])
+			plManager.AddToPlaylist(tracks[0], ctx.GetGuild().ID)
+
+			playlist := plManager.Playlist(ctx.GetGuild().ID)
+
+			if link.Player(ctx.GetGuild().ID).Position().Seconds() == 0 {
+				music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, playlist.Tracks[0])
+			}
+
 		},
 		func() {
 			_, err := session.ChannelMessageSend(ctx.GetChannel().ID, "No matches found for: "+query)
