@@ -46,7 +46,7 @@ cd ElProfessorBot
 4. export `DISCORD_BOT_TOKEN` & `YOUTUBE_API_KEY`. 
 
 ```sh
-export  DISCORD_BOT_TOKEN={DISCORD_BOT_TOKEN} && export YOUTUBE_API_KEY={YOUTUBE_API_KEY}
+export  DISCORD_BOT_TOKEN={DISCORD_BOT_TOKEN}
 ```
 
 * See [this](https://www.writebots.com/discord-bot-token/) to make a bot and get your token.
