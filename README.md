@@ -67,9 +67,11 @@ go run main.go
 ### 📑 Libraries
 
 - [DiscordGo](https://github.com/bwmarrin/discordgo)  Go package that provides low level bindings to the Discord chat client API (`go get github.com/bwmarrin/discordgo`)
-- [disgolink](github.com/DisgoOrg/disgolink) disgolink is a Lavalink Client (`go get github.com/jonas747/dca/cmd/dca`)
+- [disgolink](github.com/DisgoOrg/disgolink) disgolink is a Lavalink Client (`go get github.com/DisgoOrg/disgolink`)
 - [logrus](https://github.com/sirupsen/logrus) Structured logger for Go (`go get github.com/sirupsen/logrus`)
-- [MongoDB Go Driver](https://github.com/mongodb/mongo-go-driver) The MongoDB supported driver for Go. (`go.mongodb.org/mongo-driver/mongo`)
+- [MongoDB Go Driver](https://github.com/mongodb/mongo-go-driver) The MongoDB supported driver for Go. (`go get go.mongodb.org/mongo-driver/mongo`)
+- [Ken](https://github.com/zekrotja/ken) A prototype, object-oriented and highly modular Discord application commands handler for Discordgo. (`go get github.com/zekrotja/ken`)
+- [di](https://github.com/sarulabs/di) Dependency injection framework for go programs (golang). (`go get github.com/sarulabs/di/v2`)
 
 
 ### © Copyright Notice
