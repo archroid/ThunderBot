@@ -31,7 +31,7 @@ func InitLegacyCommandHandler(container di.Container) shireikan.Handler {
 	cmdHandler.RegisterCommand(&commands.CmdPing{})
 	cmdHandler.RegisterCommand(&commands.CmdInfo{})
 	cmdHandler.RegisterCommand(&commands.CmdClear{})
-	cmdHandler.RegisterCommand(&commands.CmdPlay{})
+	// cmdHandler.RegisterCommand(&commands.CmdPlay{})
 
 	logrus.WithField("n", len(cmdHandler.GetCommandInstances())).Info("Commands registered")
 
