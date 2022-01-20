@@ -20,30 +20,9 @@ import (
 )
 
 func main() {
-
-	// // Load the .env file in the current directory
-	// godotenv.Load()
-
+	
 	// Initialize dependency injection builder
 	diBuilder, _ := di.NewBuilder()
-
-	// Initialize dgolink
-	// diBuilder.Add(di.Def{
-	// 	Name: static.DiDgoLink,
-	// 	Build: func(ctn di.Container) (interface{}, error) {
-
-	// 		link := dgolink.New(ctn.Get(static.DiDiscordSession).(*discordgo.Session))
-
-	// 		link.AddNode(lavalink.NodeConfig{
-	// 			Name:     "test",
-	// 			Host:     "localhost",
-	// 			Port:     "2333",
-	// 			Password: "1274",
-	// 		})
-
-	// 		return link, nil
-	// 	},
-	// })
 
 	// Initialize discord bot session and shutdown routine
 	diBuilder.Add(di.Def{

@@ -14,7 +14,7 @@ const (
 	DiYoutubeSearch        = "youtubeseach"
 	DiLegacyCommandHandler = "skcommandhandler"
 	DiDgoLink              = "dgolink"
-	DiPlaylistManager = "plmanager"
+	DiPlaylistManager      = "plmanager"
 
 	DiscordInviteLink = "https://discord.com/oauth2/authorize?client_id=901356147720749096&permissions=2080374975&scope=bot+applications.commands+identify+guilds"
 

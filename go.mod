@@ -9,7 +9,6 @@ require (
 	github.com/sarulabs/di/v2 v2.4.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/zekroTJA/shireikan v0.7.0
-	github.com/zekrotja/dgrs v0.3.2
 	github.com/zekrotja/ken v0.11.1
 	go.mongodb.org/mongo-driver v1.8.2
 )
@@ -29,6 +28,7 @@ require (
 	github.com/xdg-go/scram v1.0.2 // indirect
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
+	github.com/zekrotja/dgrs v0.3.2 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/net v0.0.0-20211215060638-4ddde0e984e9 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
