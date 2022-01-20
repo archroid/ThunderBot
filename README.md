@@ -67,13 +67,11 @@ go run main.go
 ### 📑 Libraries
 
 - [DiscordGo](https://github.com/bwmarrin/discordgo)  Go package that provides low level bindings to the Discord chat client API (`go get github.com/bwmarrin/discordgo`)
-- [dca](https://github.com/jonas747/dca) An audio file format that uses opus audio packets and json metadata. (`go get github.com/jonas747/dca/cmd/dca`)
+- [disgolink](github.com/DisgoOrg/disgolink) disgolink is a Lavalink Client (`go get github.com/jonas747/dca/cmd/dca`)
 - [logrus](https://github.com/sirupsen/logrus) Structured logger for Go (`go get github.com/sirupsen/logrus`)
-- [YouTube Data API v3](https://pkg.go.dev/google.golang.org/api/youtube/v3) Package youtube provides access to the YouTube Data API v3.(`go get google.golang.org/api/youtube/v3`)
-- [Youtube in Golang](https://github.com/kkdai/youtube) Youtube video download package (`go get github.com/kkdai/youtube/v2`)
 - [MongoDB Go Driver](https://github.com/mongodb/mongo-go-driver) The MongoDB supported driver for Go. (`go.mongodb.org/mongo-driver/mongo`)
 
 
-### Copyright Notice
-- Some parts of code are originaly from project [github.com/zekroTJA/shinpuru](https://github.com/zekroTJA/shinpuru) licensed under the [MIT License](https://github.com/zekroTJA/shinpuru/blob/master/LICENCE)
+### © Copyright Notice
+- Some parts of code are originaly from project [github.com/zekroTJA/shinpuru](https://github.com/zekroTJA/shinpuru) licensed under the [MIT License](https://github.com/zekroTJA/shinpuru/blob/master/LICENCE).
 
