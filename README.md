@@ -75,5 +75,5 @@ go run main.go
 
 
 ### Copyright Notice
-- Some parts of code are originaly from project [zekroTJA/shinpuru](https://github.com/zekroTJA/shinpuru) licensed under the (MIT License)[https://github.com/zekroTJA/shinpuru/blob/master/LICENCE]
+- Some parts of code are originaly from project [github.com/zekroTJA/shinpuru](https://github.com/zekroTJA/shinpuru) licensed under the [MIT License](https://github.com/zekroTJA/shinpuru/blob/master/LICENCE)
 
