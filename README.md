@@ -74,4 +74,6 @@ go run main.go
 - [MongoDB Go Driver](https://github.com/mongodb/mongo-go-driver) The MongoDB supported driver for Go. (`go.mongodb.org/mongo-driver/mongo`)
 
 
+### Copyright Notice
+- Some parts of code are originaly from project [zekroTJA/shinpuru](https://github.com/zekroTJA/shinpuru) licensed under the (MIT License)[https://github.com/zekroTJA/shinpuru/blob/master/LICENCE]
 
