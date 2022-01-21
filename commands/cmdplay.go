@@ -62,21 +62,20 @@ func (c *CmdPlay) Exec(ctx shireikan.Context) error {
 
 	link.BestRestClient().LoadItemHandler(query, lavalink.NewResultHandler(
 		func(track lavalink.Track) {
-			// music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, track)
+			plManager.AddToPlaylist(track, ctx.GetGuild().ID)
 		},
 		func(playlist lavalink.Playlist) {
-			// music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, playlist.Tracks[0])
+			plManager.AddToPlaylist(playlist.Tracks[0], ctx.GetGuild().ID)
 		},
 		func(tracks []lavalink.Track) {
 			plManager.AddToPlaylist(tracks[0], ctx.GetGuild().ID)
 
-			playlist := plManager.Playlist(ctx.GetGuild().ID)
-
-			if link.Player(ctx.GetGuild().ID).Position().Seconds() == 0 {
-				music.Play(session, link, ctx.GetGuild(), ctx.GetUser().ID, playlist.Tracks[0])
+			if link.Player(ctx.GetGuild().ID).Track() == nil {
+				music.Play(ctx)
 			}
 
 		},
+
 		func() {
 			_, err := session.ChannelMessageSend(ctx.GetChannel().ID, "No matches found for: "+query)
 			if err != nil {

@@ -78,16 +78,16 @@ func (c *CmdInfo) Exec(ctx shireikan.Context) error {
 			},
 			{
 				Name:  "🚥 Licence",
-				Value: "Covered by the [GNU General Public License](https://github.com/archroid/ElProfessorBot/blob/main/LICENSE).",
+				Value: "Covered by the [GNU General Public License](https://github.com/archroid/ThunderBot/blob/main/LICENSE).",
 			},
 			{
 				Name:  "📑 Repository",
-				Value: "[github.com/archroid/ElProfessorBot](https://github.com/archroid/ElProfessorBot)",
+				Value: "[github.com/archroid/ElProfessorBot](https://github.com/archroid/ThunderBot)",
 			},
 
 			{
 				Name:  "🌀 Website",
-				Value: "[elprofessorbot.archroid.xyz](https://elprofessorbot.archroid.xyz)",
+				Value: "[elprofessorbot.archroid.xyz](https://ThunderBot.archroid.xyz)",
 			},
 			{
 				Name: "📡 Invite",

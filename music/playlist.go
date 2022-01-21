@@ -17,11 +17,11 @@ type Playlist struct {
 }
 
 type PlaylistManager interface {
-	Playlist(guildID string) Playlist
-	Playlists() map[string]Playlist
+	GetPlaylist(guildID string) Playlist
+	GetPlaylists() map[string]Playlist
 
 	AddToPlaylist(track lavalink.Track, guildID string) Playlist
-	GetPlaylist(guildID string) Playlist
+	RemoveLastTrack(guildID string) Playlist
 }
 
 type playlistManagertmpl struct {
@@ -30,11 +30,11 @@ type playlistManagertmpl struct {
 
 var _ PlaylistManager = (*playlistManagertmpl)(nil)
 
-func (p *playlistManagertmpl) Playlists() map[string]Playlist {
+func (p *playlistManagertmpl) GetPlaylists() map[string]Playlist {
 	return p.playlists
 }
 
-func (p *playlistManagertmpl) Playlist(guildID string) Playlist {
+func (p *playlistManagertmpl) GetPlaylist(guildID string) Playlist {
 	if playlist, ok := p.playlists[guildID]; ok {
 		return playlist
 	}
@@ -45,7 +45,7 @@ func (p *playlistManagertmpl) Playlist(guildID string) Playlist {
 
 func (p *playlistManagertmpl) AddToPlaylist(track lavalink.Track, guildID string) Playlist {
 
-	playlist := p.Playlist(guildID)
+	playlist := p.GetPlaylist(guildID)
 
 	playlist = Playlist{playlist.GuildID, append(playlist.Tracks, track)}
 
@@ -54,9 +54,19 @@ func (p *playlistManagertmpl) AddToPlaylist(track lavalink.Track, guildID string
 	return playlist
 }
 
-func (p *playlistManagertmpl) GetPlaylist(guildID string) Playlist {
+func (p *playlistManagertmpl) RemoveLastTrack(guildID string) Playlist {
+	playlist := p.GetPlaylist(guildID)
 
-	playlist := p.Playlist(guildID)
+	playlist = Playlist{GuildID: guildID, Tracks: removeIndex(playlist.Tracks, 1)}
+
+	p.playlists[playlist.GuildID] = playlist
 
 	return playlist
+
+}
+
+func removeIndex(s []lavalink.Track, index int) []lavalink.Track {
+	ret := make([]lavalink.Track, 0)
+	ret = append(ret, s[:index]...)
+	return append(ret, s[index+1:]...)
 }
